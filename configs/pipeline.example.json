@@ -1,0 +1,29 @@
+{
+  "sequence": {
+    "observations_npz": "runs/demo/observations.npz",
+    "object_points_npy": "runs/demo/object_points_m.npy"
+  },
+  "intent": {
+    "hand_side": "right",
+    "max_contact_distance_m": 0.018,
+    "min_pinch_width_m": 0.005,
+    "max_pinch_width_m": 0.11,
+    "min_joint_confidence": 0.5,
+    "min_stable_frames": 3,
+    "continuous_symmetry_axis": null,
+    "approach_distance_m": 0.10
+  },
+  "selection": {
+    "candidates_npz": "runs/demo/candidates.npz",
+    "min_jaw_width_m": 0.0,
+    "max_jaw_width_m": 0.08,
+    "max_center_distance_m": 0.06,
+    "max_closing_axis_error_deg": 45.0,
+    "max_approach_axis_error_deg": 60.0,
+    "top_k": 8
+  },
+  "outputs": {
+    "intent_json": "runs/demo/grasp_intent.json",
+    "selected_grasp_json": "runs/demo/selected_grasp.json"
+  }
+}

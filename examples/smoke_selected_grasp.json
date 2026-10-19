@@ -1,0 +1,11 @@
+{
+  "T_object_gripper_tcp": [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, -1.0, 0.0, 0.0],
+    [0.0, 0.0, -1.0, 0.0],
+    [0.0, 0.0, 0.0, 1.0]
+  ],
+  "pregrasp_width_m": 0.08,
+  "close_target_width_m": 0.0,
+  "approach_distance_m": 0.10
+}

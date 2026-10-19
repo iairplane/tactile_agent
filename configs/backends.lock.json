@@ -1,0 +1,92 @@
+{
+  "locked_at": "2026-10-16",
+  "default_profile": "sota_known_cad",
+  "backends": {
+    "segmentation": {
+      "name": "Meta SAM 3 (local text-prompted object segmentation)",
+      "repository": "https://github.com/facebookresearch/sam3.git",
+      "revision": "6fe87d64a5beb9084923d7a9e002741178635b09",
+      "source_license": "SAM License",
+      "checkpoint": "sam3.pt",
+      "reason": "Actually executed local object-mask backend: a text prompt selects the target without a ground-truth box or mask."
+    },
+    "frontier_segmentation_optional": {
+      "name": "SAM 3.1",
+      "repository": "https://github.com/facebookresearch/sam3.git",
+      "revision": "7f473cfd983d5eb43040ff608f66bff0d7bdcb53",
+      "source_license": "SAM License",
+      "checkpoint_access": "gated",
+      "reason": "Latest target profile; the Hugging Face checkpoint is gated and is not the checkpoint used by the current local evidence run."
+    },
+    "hand_video_segmentation": {
+      "name": "SAM 2.1",
+      "repository": "https://github.com/facebookresearch/sam2.git",
+      "revision": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+      "source_license": "Apache-2.0",
+      "reason": "Interactive multi-object video masks for the hand and independently moving parts in human-demonstration sequences."
+    },
+    "hand_pose": {
+      "name": "RTMPose-m Hand5 via rtmlib",
+      "repository": "https://github.com/Tau-J/rtmlib.git",
+      "revision": "03a1693e59e4f7cd84582c0fb30459b3bf18ad42",
+      "release": "0.0.16",
+      "runtime": "Python 3.10.20; rtmlib 0.0.16; onnxruntime-gpu 1.23.2; CUDAExecutionProvider",
+      "checkpoint": "RTMPose-m Hand5 256x256 ONNX",
+      "checkpoint_url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/rtmpose-m_simcc-hand5_pt-aic-coco_210e-256x256-74fb594_20230320.zip",
+      "source_license": "Apache-2.0",
+      "reason": "Actual 21-joint hand backend: SAM hand-mask bbox, RTMPose 2D joints, then aligned RGB-D backprojection into camera metres."
+    },
+    "hand_reconstruction_optional": {
+      "name": "AnyHand-WiLoR (optional MANO reconstruction)",
+      "repository": "https://github.com/chen-si-cs/AnyHand.git",
+      "revision": "de76afabeb49b6d58513ba895755dfdda39f8410",
+      "submodules": true,
+      "source_license": "research terms; inspect upstream",
+      "model_license": "CC BY-NC-ND plus MANO terms",
+      "reason": "Optional mesh/MANO reconstruction when its model and MANO license terms are accepted; not required by the default 21-joint pipeline."
+    },
+    "known_object_pose": {
+      "name": "WAPR",
+      "repository": "https://github.com/WangYuLin-SEU/WAPR.git",
+      "revision": "f165cec8ebdd48ae6f46d06a46c40d796ab80b71",
+      "source_license": "LGPL-2.1-only",
+      "model_license": "CC-BY-ND-4.0",
+      "runtime": "Python 3.10; torch 2.7.1+cu128; torchvision 0.22.1+cu128; WAPR_BACKEND=torch; TensorRT not required",
+      "weights": "wapr_w_mask.pth; wapr_wo_mask.pth; sapr.pth; wbps.pth",
+      "reason": "Primary known-CAD backend for a supplied RGB-D frame and target mask; outputs object-to-camera pose in metres."
+    },
+    "known_object_pose_fallback": {
+      "name": "NVlabs FoundationPose (original PyTorch implementation)",
+      "repository": "https://github.com/NVlabs/FoundationPose.git",
+      "revision": "a1b694b83e633c2cb6115b9063d940a687759392",
+      "source_license": "NVIDIA Source Code License (non-commercial research/evaluation only)",
+      "model_license": "NVIDIA Source Code License (non-commercial research/evaluation only)",
+      "runtime": "Python 3.11.16; torch 2.7.0+cu128; torchvision 0.22.0+cu128; pytorch3d 0.7.9; nvdiffrast 0.4.0; CUDA extensions built for sm_120",
+      "weights": "refiner 2023-10-28-18-33-37/model_best.pth; scorer 2024-01-11-20-02-45/model_best.pth",
+      "reason": "Installed and executed fallback using the original PyTorch register/track implementation."
+    },
+    "unknown_object_pose_optional": {
+      "name": "Point2Pose",
+      "repository": "https://github.com/tzuyuan/point-to-pose.git",
+      "revision": "51856226610df75e5c06e8de545bd27f7c4ba99c",
+      "source_license": "BSD-3-Clause",
+      "reason": "RGB-D online pose tracking and reconstruction for objects without CAD."
+    },
+    "grasp_candidates": {
+      "name": "GraspGenX",
+      "repository": "https://github.com/NVlabs/GraspGenX.git",
+      "revision": "b9429097728cb1c430dd78b92edf17ba318aad03",
+      "source_license": "Apache-2.0",
+      "model_license": "NVIDIA Open Model License",
+      "reason": "Cross-embodiment 6-DoF candidates for Panda and other parallel grippers."
+    },
+    "simulation": {
+      "name": "RoboDojo Isaac Lab",
+      "repository": "https://github.com/yuechen0614/IsaacLab.git",
+      "revision": "afca7b09d60d8beb9c1cb28b43066499940b969b",
+      "source_license": "BSD-3-Clause",
+      "runtime": "Isaac Sim 5.1.0.0; isaaclab package 0.54.3; Python 3.11.16; proprietary platform components",
+      "reason": "Exact Isaac Lab source embedded in the installed RoboDojo environment."
+    }
+  }
+}
