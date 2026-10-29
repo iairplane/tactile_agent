@@ -1,0 +1,6 @@
+{
+  "factory": "demo2gripper.test_tube_tactile_interpreter:create_test_tube_tactile_interpreter",
+  "config": {
+    "qualification_bundle": "examples/test_tube_tactile_interpreter.qualification.template.json"
+  }
+}

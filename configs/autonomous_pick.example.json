@@ -1,0 +1,107 @@
+{
+  "schema": "demo2gripper.autonomous_pick_config.v1",
+  "repo_root": "..",
+  "commands": {
+    "capture": [
+      "/path/to/python-with-pyrealsense2",
+      "scripts/capture_realsense_rgbd.py"
+    ],
+    "localize": [
+      ".venv/bin/python",
+      "scripts/localize_supported_object.py"
+    ],
+    "register": [
+      ".venv/bin/python",
+      "scripts/register_live_object_pose.py"
+    ],
+    "ground": [
+      ".venv/bin/python",
+      "scripts/ground_live_grasp_candidate.py"
+    ],
+    "pose": [
+      "scripts/run_ros_python.sh",
+      "scripts/moveit_pose_goal.py"
+    ],
+    "cartesian": [
+      "scripts/run_ros_python.sh",
+      "scripts/moveit_cartesian_smoke.py"
+    ],
+    "hande": [
+      "/usr/bin/env",
+      "PYTHONPATH=/path/to/lerobot/src",
+      "/path/to/hande-python",
+      "scripts/hande_cli.py"
+    ]
+  },
+  "inputs": {
+    "compiler_report": "../runs/live/DEMONSTRATION/agentic_skill_prototype/compiler_report.json",
+    "object_template_dir": "../runs/live/DEMONSTRATION/object_frame_intent",
+    "object_frame_id": "REPLACE_WITH_SELECTED_OBJECT_FRAME_ID",
+    "T_base_camera": "../calibration/T_base_camera.npy",
+    "T_link8_tcp": "../calibration/T_link8_canonical_tcp.npy"
+  },
+  "observation": {
+    "camera_serial": "REALSENSE_SERIAL",
+    "frames": 5,
+    "warmup_frames": 30,
+    "workspace_min_base_m": [0.62, 0.015, -0.02],
+    "workspace_max_base_m": [0.678, 0.09, 0.08],
+    "support_band_base_z_m": [-0.015, 0.03],
+    "min_height_above_support_m": 0.008
+  },
+  "motion": {
+    "lift_delta_base_m": [0.0, 0.0, 0.04],
+    "failure_retreat_m": 0.08,
+    "velocity_scale": 0.03,
+    "acceleration_scale": 0.03,
+    "max_cartesian_speed_m_s": 0.02,
+    "descend_correction_speed_m_s": 0.01,
+    "max_descend_corrections": 2,
+    "pose_position_tolerance_m": 0.001,
+    "pose_orientation_tolerance_rad": 0.005,
+    "max_pregrasp_translation_m": 0.5,
+    "max_pregrasp_rotation_rad": 3.141592653589793,
+    "min_joint_limit_margin_rad": 0.05,
+    "max_joint_sweep_rad": 2.0,
+    "max_total_joint_sweep_rad": 7.0
+  },
+  "gripper": {
+    "port": "/dev/serial/by-id/usb-FTDI_REPLACE_ME",
+    "speed_register": 20,
+    "force_register": 20,
+    "timeout_s": 8.0
+  },
+  "thresholds": {
+    "min_pregrasp_clearance_m": 0.04,
+    "min_tcp_support_clearance_m": 0.003,
+    "min_object_width_m": 0.005,
+    "max_gripper_opening_m": 0.05,
+    "gripper_width_margin_m": 0.003,
+    "max_grasp_offset_m": 0.05,
+    "max_approach_distance_m": 0.12,
+    "max_lift_segment_m": 0.05,
+    "max_lift_distance_m": 0.12,
+    "min_downward_approach_alignment": 0.95,
+    "max_closing_axis_vertical_component": 0.25,
+    "max_measured_position_error_m": 0.008,
+    "max_measured_tcp_position_error_m": 0.005,
+    "max_measured_orientation_error_deg": 5.0,
+    "max_final_grasp_tcp_error_m": 0.002,
+    "max_descend_correction_m": 0.012,
+    "max_descend_correction_xy_m": 0.003,
+    "min_opening_before_descent_m": 0.048,
+    "min_grasped_opening_m": 0.02,
+    "max_grasped_opening_m": 0.035,
+    "max_anchor_center_deviation_m": 0.003,
+    "max_anchor_rms_deviation_m": 0.002,
+    "max_anchor_point_count_cv": 0.1,
+    "min_object_height_above_support_m": 0.024,
+    "max_object_height_above_support_m": 0.04,
+    "min_anchor_z_m": 0.042,
+    "max_anchor_z_m": 0.052,
+    "tcp_xy_min_base_m": [0.625, 0.02],
+    "tcp_xy_max_base_m": [0.685, 0.085],
+    "object_extent_min_m": [0.025, 0.014, 0.014],
+    "object_extent_max_m": [0.045, 0.035, 0.024]
+  }
+}

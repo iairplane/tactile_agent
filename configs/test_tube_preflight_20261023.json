@@ -1,0 +1,143 @@
+{
+  "schema": "demo2gripper.test_tube_preflight_config.v1",
+  "task_id": "test_tube_demo_20261023_02",
+  "frames": {
+    "base": "fr3_link0",
+    "tcp": "hande_tcp",
+    "tube": "test_tube_axis",
+    "socket": "test_tube_rack_socket",
+    "transform_convention": "T_parent_child"
+  },
+  "evidence": {
+    "tube_grasp_relation": {
+      "path": "../runs/live/test_tube_demo_20261023_02/analysis/tube_grasp_relation.json",
+      "reviewed": true
+    },
+    "live_tube_pose": {
+      "path": "../runs/live/test_tube_demo_20261023_02/analysis/live_tube_pose.json",
+      "reviewed": true
+    },
+    "socket_frame": {
+      "path": "../runs/live/test_tube_demo_20261023_02/analysis/socket_frame.json",
+      "reviewed": true
+    },
+    "tactile_observability": {
+      "path": "../runs/live/test_tube_demo_20261023_02/analysis/tactile_observability.json",
+      "reviewed": true
+    },
+    "gf220_sdk_calibrations": {
+      "path": "../runs/live/medicine_bottle_execution_20261023_01/gf220_task_calibration_01/calibrations.json",
+      "reviewed": true
+    },
+    "front_rgb_pivot_reference": {
+      "path": "test_tube_front_rgb_pivot_reference_20261023.json",
+      "reviewed": true
+    },
+    "front_rgb_tracker_validation": {
+      "path": "../runs/live/test_tube_demo_20261023_02/analysis/test_tube_rgb_tracker_validation.json",
+      "reviewed": true
+    },
+    "d435_live_source": {
+      "path": "../src/demo2gripper/d435_live.py",
+      "reviewed": true
+    },
+    "offline_runtime_orchestrator": {
+      "path": "../src/demo2gripper/test_tube_runtime.py",
+      "reviewed": true
+    },
+    "offline_predicate_builder": {
+      "path": "../src/demo2gripper/test_tube_predicates.py",
+      "reviewed": true
+    },
+    "rgb_tracker_qualification_tool": {
+      "path": "../scripts/qualify_test_tube_rgb_tracker.py",
+      "reviewed": true
+    },
+    "rgb_tracker_qualification_evaluator": {
+      "path": "../src/demo2gripper/test_tube_rgb_qualification.py",
+      "reviewed": true
+    }
+  },
+  "tilt": {
+    "target_semantics": "same_fixed_camera_demonstration_reference",
+    "target_relative_deg": 45.0,
+    "target_image_axis_deg": 135.50258166672103,
+    "tolerance_deg": 5.0,
+    "confirmation_windows": 4,
+    "allowed_target_sources": [
+      "front_rgb_calibrated"
+    ],
+    "tactile_angle_calibration_id": null,
+    "front_rgb_angle_calibration_id": "test-tube-front-rgb-ce693992be053f54b28963acebedaa31122acb826b30b24ef804cb0c0186d87b",
+    "front_rgb_runtime_gate_qualified": false
+  },
+  "tactile": {
+    "profile_id": "test_tube_gf220.pending.v1",
+    "execution_qualified": false,
+    "predicate_modes": {
+      "contact": "conditional_runtime_bootstrap",
+      "slip": "shadow_only",
+      "insertion_jam": "shadow_only"
+    },
+    "bootstrap": {
+      "fresh_unloaded_baseline_required": true,
+      "positive_contact_required": true,
+      "unloaded_window_count": 3,
+      "positive_contact_window_count": 3,
+      "session_scoped": true,
+      "min_unique_samples": 5,
+      "min_calibration_windows_per_stage": 3,
+      "max_age_s": 0.2,
+      "max_pair_skew_s": 0.08,
+      "minimum_fz_change_sensor_units": 0.001,
+      "minimum_threshold_floor_sensor_units": 0.001,
+      "positive_margin_noise_multiplier": 8.0,
+      "threshold_noise_multiplier": 6.0,
+      "minimum_consistent_positive_fraction": 0.6666666667,
+      "engage_fraction_of_positive": 0.25,
+      "retain_fraction_of_positive": 0.1,
+      "contact_confirmation_windows": 2,
+      "loss_confirmation_windows": 2
+    },
+    "contact_policy": "any_finger_valid_contact",
+    "contact_confirmation_windows": 2,
+    "slip_confirmation_windows": 1,
+    "pivot_open_step_m": 0.00025,
+    "max_pivot_opening_delta_m": 0.002,
+    "reclamp_step_m": 0.0005,
+    "max_reclamp_steps": 4,
+    "insertion_jam": {
+      "min_progress_ratio": 0.25,
+      "confirmation_windows": 2,
+      "resistance_delta_threshold": null,
+      "resistance_units": null
+    }
+  },
+  "motion": {
+    "approach_standoff_m": 0.06,
+    "extract_clearance_m": 0.04,
+    "pivot_max_microsteps": 8,
+    "insertion_step_m": 0.0015,
+    "insertion_target_depth_m": null,
+    "jam_retract_m": 0.003,
+    "max_jam_recoveries": 2,
+    "retreat_m": 0.05,
+    "velocity_scale": 0.03,
+    "acceleration_scale": 0.03
+  },
+  "execution_readiness": {
+    "exact_tube_tcp_instantiated": false,
+    "gripper_width_and_close_budget_grounded": false,
+    "collision_scene_validated": false,
+    "motion_bounds_validated": false,
+    "offline_runtime_orchestrator_available": true,
+    "offline_predicate_builder_available": true,
+    "rgb_tracker_qualification_tool_available": true,
+    "long_lived_front_rgb_source_available": true,
+    "live_hardware_adapter_available": false,
+    "live_feedback_predicate_producers_available": false,
+    "support_after_release_verifier_available": false,
+    "robot_command_state_path_healthy": false,
+    "front_rgb_stream_healthy": false
+  }
+}

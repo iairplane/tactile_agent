@@ -7,4 +7,5 @@ third_party/
 checkpoints/
 runs/
 outputs/
+log/
 *.egg-info/

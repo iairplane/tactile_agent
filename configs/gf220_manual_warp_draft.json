@@ -1,0 +1,54 @@
+{
+  "schema": "demo2gripper.gf220_manual_warp_profile.v1",
+  "status": "draft_unloaded_confirmation_required",
+  "captured_on": "2026-10-23",
+  "stream": {
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "fourcc": "MJPG"
+  },
+  "output": {
+    "width": 240,
+    "height": 240
+  },
+  "sensors": [
+    {
+      "name": "gf220_184603",
+      "sdk_serial": "GF220GF22000184603F72A",
+      "uvc_device": "/dev/v4l/by-id/usb-HBVCAM_Camera_ViTai-GF220_GF22000184603-video-index0",
+      "logical_side": null,
+      "corner_order": "top_left_top_right_bottom_right_bottom_left",
+      "corners_xy": [
+        [80, 83],
+        [455, 137],
+        [456, 369],
+        [76, 447]
+      ],
+      "corner_source": "estimated_from_current_640x480_raw_frame",
+      "unloaded_calibration_confirmed": false,
+      "force6d_calibrated": false
+    },
+    {
+      "name": "gf220_196fb3",
+      "sdk_serial": "GF220GF22000196FB398F5",
+      "uvc_device": "/dev/v4l/by-id/usb-HBVCAM_Camera_ViTai-GF220_GF22000196FB3-video-index0",
+      "logical_side": null,
+      "corner_order": "top_left_top_right_bottom_right_bottom_left",
+      "corners_xy": [
+        [86, 96],
+        [469, 136],
+        [470, 355],
+        [84, 442]
+      ],
+      "corner_source": "estimated_from_current_640x480_raw_frame",
+      "unloaded_calibration_confirmed": false,
+      "force6d_calibrated": false
+    }
+  ],
+  "notes": [
+    "The serial-to-left/right mapping is not established.",
+    "The four corners produce non-black 240x240 manual warped images, but must be checked again with both pads unloaded.",
+    "No force axis, sign, scale, unit, noise, or latency calibration has been performed."
+  ]
+}

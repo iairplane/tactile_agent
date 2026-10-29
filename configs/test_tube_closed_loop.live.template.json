@@ -1,0 +1,148 @@
+{
+  "schema": "demo2gripper.test_tube_closed_loop_config.v1",
+  "task_id": "test-tube-seven-stage-live-template",
+  "execution_scope": "live_candidate",
+  "geometry": {
+    "relation_id": "test_tube_demo_20261023_02-normalized-top-down",
+    "relation_source": "reviewed_demo_axial_fraction_plus_runtime_live_tube_pose",
+    "relation_runtime_qualified": false,
+    "T_tube_tcp_demo_grasp": null,
+    "normalized_demo_grasp": {
+      "axial_fraction_closed_to_open": 0.664323374340949,
+      "tube_length_m": null,
+      "tube_length_source": null,
+      "preferred_jaw_axis_base": [-0.8893638, 0.32929212, 0.31717304],
+      "top_approach_direction_base": [0.0, 0.0, -1.0],
+      "tube_pose_origin": "geometric_centre",
+      "tube_axis_contract": "closed_to_open"
+    },
+    "socket_entry_source": "unqualified_template",
+    "socket_entry_runtime_qualified": false,
+    "T_socket_tube_entry": null,
+    "tube_axis_tube": [0.0, 0.0, 1.0],
+    "socket_outward_axis_socket": [0.0, 0.0, 1.0]
+  },
+  "pose_backend": {
+    "name": "external",
+    "service_url": "http://127.0.0.1:8765",
+    "service_backend_name": "f2g_pose",
+    "adapter": "demo2gripper.test_tube_live_io:create_live_io",
+    "qualification_receipt": null,
+    "source_qualification_receipt": null,
+    "timeout_s": 0.25,
+    "max_staleness_s": 0.25,
+    "max_server_latency_s": 0.20,
+    "max_roundtrip_latency_s": 0.25
+  },
+  "live_adapter": {
+    "schema": "demo2gripper.test_tube_live_io.v1",
+    "demo_relation_qualification_receipt": null,
+    "camera": {
+      "serial": "254622073804",
+      "camera_extrinsic": null,
+      "camera_extrinsic_qualification_receipt": null,
+      "width": 640,
+      "height": 480,
+      "fps": 30,
+      "warmup_frames": 15,
+      "frame_timeout_ms": 1000
+    },
+    "scene_interpreter": {
+      "factory": "demo2gripper.test_tube_pose_tracker:create_static_source_tube_scene_interpreter",
+      "qualification_receipt": null,
+      "config": {
+        "camera_serial": "254622073804",
+        "reviewed_seed_rgb": null,
+        "reviewed_initial_mask": null,
+        "reviewed_seed_qualification_receipt": null,
+        "camera_extrinsic_qualification_receipt": null,
+        "intrinsics": null,
+        "reviewed_open_uv": null,
+        "reviewed_closed_uv": null,
+        "reviewed_endpoints_evidence_id": null,
+        "tracking_id": "test-tube-current-session",
+        "mask_tracker": {},
+        "foreground_depth": {},
+        "pose_qualifier": {},
+        "downstream_factory": "demo2gripper.test_tube_downstream_scene:create_qualified_held_tube_scene_interpreter",
+        "downstream_config": {
+          "camera_extrinsic": null,
+          "camera_extrinsic_qualification_receipt": null,
+          "intrinsics": null,
+          "camera_serial": "254622073804",
+          "static_socket_pose": null,
+          "static_socket_pose_qualification_receipt": null,
+          "scene_qualification_receipt": null,
+          "rgb_tracker_qualification_report": null,
+          "pivot_reference": null,
+          "T_tube_tcp_demo_grasp": null,
+          "T_socket_tube_entry": null,
+          "socket_outward_axis_socket": [0.0, 0.0, 1.0],
+          "pivot_plane_normal_tcp": [1.0, 0.0, 0.0],
+          "pivot_point_tcp": [0.0, 0.0, 0.0],
+          "jaw_axis_tcp": [1.0, 0.0, 0.0],
+          "reviewed_seed_line_uv": null,
+          "axis_roi_uvxy": null,
+          "tracking_id": "test-tube-current-session",
+          "tracker": {},
+          "hough": {},
+          "policy": {
+            "tube_length_m": null,
+            "extract_clearance_m": 0.03,
+            "insertion_target_depth_m": null
+          }
+        }
+      }
+    },
+    "socket": {
+      "pose": null,
+      "pose_qualification_receipt": null
+    },
+    "tactile": {
+      "gf220_profile": "configs/gf220_manual_warp_draft.json",
+      "factory": "demo2gripper.test_tube_tactile_interpreter:create_test_tube_tactile_interpreter",
+      "qualification_receipt": null,
+      "config": {
+        "qualification_bundle": "examples/test_tube_tactile_interpreter.qualification.template.json"
+      },
+      "hande_port": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AQ00O97B-if00-port0",
+      "modbus_timeout_s": 0.12,
+      "startup_timeout_s": 15.0,
+      "calibration_timeout_s": 15.0,
+      "runtime_samples": 4,
+      "runtime_timeout_s": 0.25
+    },
+    "robot": {
+      "base_frame": "fr3_link0",
+      "link8_frame": "fr3_link8",
+      "joint_topic": "/joint_states",
+      "tcp": "calibration/T_link8_canonical_tcp.npy",
+      "tcp_qualification_receipt": null,
+      "collision_payload_qualification_receipt": null,
+      "moveit": {
+        "pose_goal_script": "scripts/moveit_pose_goal.py",
+        "setup_scripts": [
+          "/opt/ros/jazzy/setup.bash",
+          "third_party/franka_ros2_ws/install_ros/setup.bash"
+        ],
+        "velocity_scale": 0.03,
+        "acceleration_scale": 0.03,
+        "command_timeout_s": 60.0
+      },
+      "servo": {
+        "node_name": "/servo_node",
+        "twist_topic": "/servo_node/delta_twist_cmds",
+        "status_topic": "/servo_node/status",
+        "switch_command_type_service": "/servo_node/switch_command_type",
+        "pause_service": "/servo_node/pause_servo",
+        "command_period_s": 0.02,
+        "command_horizon_s": 0.10,
+        "max_linear_m_s": 0.08,
+        "max_angular_rad_s": 0.8,
+        "position_tolerance_m": 0.0015,
+        "rotation_tolerance_rad": 0.0261799388
+      }
+    }
+  },
+  "policy": {}
+}

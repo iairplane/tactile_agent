@@ -1,7 +1,12 @@
+import argparse
+import json
+from pathlib import Path
+
 import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation
 
+from demo2gripper.cli import _select_grasp
 from demo2gripper.models import GraspCandidates, GraspIntent
 from demo2gripper.selection import (
     SelectionConfig,
@@ -101,6 +106,71 @@ def test_pose_error_limits_are_hard_constraints() -> None:
     )
     with pytest.raises(ValueError, match="width and pose-error limits"):
         select_grasp_candidate(_intent(), candidates, impossible)
+
+
+@pytest.mark.parametrize("robot_adapted", [False, True])
+def test_select_grasp_records_hard_gates_and_preserves_robot_adaptation(
+    tmp_path: Path, robot_adapted: bool
+) -> None:
+    directory = tmp_path
+    intent_path = directory / "intent.json"
+    candidates_path = directory / "candidates.npz"
+    output_path = directory / "selected.json"
+    intent_payload = _intent().to_dict()
+    intent_payload["object_frame_id"] = "template:abc123"
+    if robot_adapted:
+        intent_payload.update(
+            {
+                "schema": "demo2gripper.robot_adapted_grasp_intent.v1",
+                "intent_role": "robot_adapted_hande",
+            }
+        )
+    intent_path.write_text(json.dumps(intent_payload), encoding="utf-8")
+    np.savez_compressed(
+        candidates_path,
+        poses=np.stack([np.eye(4)]),
+        scores=np.ones(1),
+        widths_m=np.asarray([0.04]),
+        gripper_name=np.asarray("robotiq_hande"),
+        object_frame_id=np.asarray("template:abc123"),
+        frame_convention=np.asarray(
+            "T_object_gripper_tcp; +X closing, +Z approach"
+        ),
+    )
+
+    _select_grasp(
+        argparse.Namespace(
+            intent=str(intent_path),
+            candidates=str(candidates_path),
+            output=str(output_path),
+            min_jaw_width_m=0.01,
+            max_jaw_width_m=0.05,
+            max_center_distance_m=0.01,
+            max_closing_axis_error_deg=15.0,
+            max_approach_axis_error_deg=20.0,
+            approach_distance_m=0.08,
+            top_k=1,
+            gripper_name=None,
+            object_frame_id=None,
+        )
+    )
+
+    selected = json.loads(output_path.read_text(encoding="utf-8"))
+    assert selected["selection"]["hard_gates_passed"] is True
+    assert selected["selection"]["hard_gate_thresholds"] == {
+        "min_gripper_width_m": 0.01,
+        "max_gripper_width_m": 0.05,
+        "max_center_distance_m": 0.01,
+        "max_closing_axis_error_rad": pytest.approx(np.deg2rad(15.0)),
+        "max_approach_axis_error_rad": pytest.approx(np.deg2rad(20.0)),
+    }
+    if robot_adapted:
+        assert selected["intent_provenance"] == {
+            "schema": "demo2gripper.robot_adapted_grasp_intent.v1",
+            "intent_role": "robot_adapted_hande",
+        }
+    else:
+        assert "intent_provenance" not in selected
 
 
 def test_axially_equivalent_candidates_have_equal_geometry_cost() -> None:

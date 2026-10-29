@@ -1,0 +1,43 @@
+{
+  "schema": "demo2gripper.gf220_wrench_transform_profile.v1",
+  "status": "draft",
+  "profile_id": "medicine-cap-gf220-draft.v1",
+  "task_frame_id": "medicine_cap_task",
+  "calibration_id_source": "GF220LiveSource.calibrate_unloaded",
+  "bottle_axis_task": [0.0, 0.0, 1.0],
+  "axis_point_task_m": [0.0, 0.0, 0.0],
+  "min_samples": 5,
+  "max_age_s": 0.6,
+  "max_pair_skew_s": 0.15,
+  "future_tolerance_s": 0.001,
+  "sensors": [
+    {
+      "serial": "GF220GF22000184603F72A",
+      "logical_side": "left",
+      "R_task_sensor": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+      "contact_position_task_m": [0.02, 0.0, 0.0],
+      "force6d_bias": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+      "provenance": {
+        "serial_side_mapping_id": "DRAFT-review-required",
+        "task_sensor_rotation_id": "DRAFT-review-required",
+        "contact_position_id": "DRAFT-review-required",
+        "force6d_bias_id": "live-unloaded-session-plus-draft-zero-offset",
+        "force6d_axes_units_id": "DRAFT-review-required"
+      }
+    },
+    {
+      "serial": "GF220GF22000196FB398F5",
+      "logical_side": "right",
+      "R_task_sensor": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+      "contact_position_task_m": [-0.02, 0.0, 0.0],
+      "force6d_bias": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+      "provenance": {
+        "serial_side_mapping_id": "DRAFT-review-required",
+        "task_sensor_rotation_id": "DRAFT-review-required",
+        "contact_position_id": "DRAFT-review-required",
+        "force6d_bias_id": "live-unloaded-session-plus-draft-zero-offset",
+        "force6d_axes_units_id": "DRAFT-review-required"
+      }
+    }
+  ]
+}

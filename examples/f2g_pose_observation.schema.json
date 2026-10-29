@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://demo2gripper.local/schemas/pose_observation.v1.json",
+  "title": "demo2gripper remote pose observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "request_id",
+    "capture",
+    "accepted",
+    "pose",
+    "coordinate_frame",
+    "produced_at_unix_s",
+    "mask_quality",
+    "foreground_depth",
+    "pose_quality",
+    "latency",
+    "backend",
+    "reject_reasons"
+  ],
+  "properties": {
+    "schema": {"const": "demo2gripper.pose_observation.v1"},
+    "request_id": {"type": "string", "minLength": 1},
+    "capture": {"$ref": "#/$defs/capture"},
+    "accepted": {"type": "boolean"},
+    "pose": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["T_camera_object", "size_m"],
+          "properties": {
+            "T_camera_object": {"$ref": "#/$defs/transform"},
+            "size_m": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {"type": "number", "exclusiveMinimum": 0}
+            }
+          }
+        }
+      ]
+    },
+    "coordinate_frame": {"type": "string", "minLength": 1},
+    "produced_at_unix_s": {"type": "number"},
+    "mask_quality": {"$ref": "#/$defs/mask_quality"},
+    "foreground_depth": {"$ref": "#/$defs/foreground_depth"},
+    "pose_quality": {"$ref": "#/$defs/pose_quality"},
+    "latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preprocess_s", "inference_s", "total_server_s"],
+      "properties": {
+        "preprocess_s": {"type": "number", "minimum": 0},
+        "inference_s": {"type": "number", "minimum": 0},
+        "total_server_s": {"type": "number", "minimum": 0}
+      }
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "implementation_version",
+        "code_revision",
+        "checkpoint_sha256",
+        "device",
+        "pose_only"
+      ],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "implementation_version": {"type": "string", "minLength": 1},
+        "code_revision": {"type": "string", "minLength": 1},
+        "checkpoint_sha256": {"type": "string", "minLength": 1},
+        "device": {"type": "string", "minLength": 1},
+        "pose_only": {"const": true}
+      }
+    },
+    "reject_reasons": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "frame_id", "timestamp_s", "clock_domain"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 0},
+        "frame_id": {"type": "string", "minLength": 1},
+        "timestamp_s": {"type": "number"},
+        "clock_domain": {"type": "string", "minLength": 1}
+      }
+    },
+    "transform": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "array",
+        "minItems": 4,
+        "maxItems": 4,
+        "items": {"type": "number"}
+      }
+    },
+    "mask_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_score",
+        "pixel_count",
+        "area_fraction",
+        "bbox_xyxy",
+        "gate_passed",
+        "reject_reasons"
+      ],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "source_score": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "number", "minimum": 0, "maximum": 1}
+          ]
+        },
+        "pixel_count": {"type": "integer", "minimum": 0},
+        "area_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "bbox_xyxy": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "integer", "minimum": 0}
+        },
+        "gate_passed": {"type": "boolean"},
+        "reject_reasons": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "depth_cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "pixels", "fraction", "min_m", "median_m", "max_m", "span_m"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 0},
+        "pixels": {"type": "integer", "minimum": 0},
+        "fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "min_m": {"type": "number", "minimum": 0},
+        "median_m": {"type": "number", "minimum": 0},
+        "max_m": {"type": "number", "minimum": 0},
+        "span_m": {"type": "number", "minimum": 0}
+      }
+    },
+    "nullable_nonnegative_number": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "number", "minimum": 0}
+      ]
+    },
+    "foreground_depth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "valid_mask_pixels",
+        "valid_mask_fraction",
+        "cluster_count",
+        "selected_cluster_index",
+        "selected_cluster_pixels",
+        "selected_cluster_fraction",
+        "selected_median_m",
+        "selected_span_m",
+        "outside_ring_valid_pixels",
+        "outside_ring_median_m",
+        "mask_near_background_fraction",
+        "clusters",
+        "gate_passed",
+        "reject_reasons"
+      ],
+      "properties": {
+        "policy": {"const": "nearest_significant_nonbackground_cluster.v1"},
+        "valid_mask_pixels": {"type": "integer", "minimum": 0},
+        "valid_mask_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "cluster_count": {"type": "integer", "minimum": 0},
+        "selected_cluster_index": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "integer", "minimum": 0}
+          ]
+        },
+        "selected_cluster_pixels": {"type": "integer", "minimum": 0},
+        "selected_cluster_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "selected_median_m": {"$ref": "#/$defs/nullable_nonnegative_number"},
+        "selected_span_m": {"$ref": "#/$defs/nullable_nonnegative_number"},
+        "outside_ring_valid_pixels": {"type": "integer", "minimum": 0},
+        "outside_ring_median_m": {"$ref": "#/$defs/nullable_nonnegative_number"},
+        "mask_near_background_fraction": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "number", "minimum": 0, "maximum": 1}
+          ]
+        },
+        "clusters": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/depth_cluster"}
+        },
+        "gate_passed": {"type": "boolean"},
+        "reject_reasons": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "pose_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_confidence",
+        "temporal_track_confirmed",
+        "axis_sign_status",
+        "axis_sign_source",
+        "cylindrical_roll_status",
+        "cylindrical_roll_source",
+        "task_qualified"
+      ],
+      "properties": {
+        "model_confidence": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "number", "minimum": 0, "maximum": 1}
+          ]
+        },
+        "temporal_track_confirmed": {"type": "boolean"},
+        "axis_sign_status": {"enum": ["unresolved", "resolved", "not_applicable"]},
+        "axis_sign_source": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "cylindrical_roll_status": {
+          "enum": ["unresolved", "canonicalized", "observable", "not_applicable"]
+        },
+        "cylindrical_roll_source": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "task_qualified": {"type": "boolean"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"accepted": {"const": true}}},
+      "then": {
+        "properties": {
+          "pose": {"type": "object"},
+          "reject_reasons": {"maxItems": 0}
+        }
+      },
+      "else": {
+        "properties": {
+          "pose": {"type": "null"},
+          "reject_reasons": {"minItems": 1}
+        }
+      }
+    }
+  ]
+}

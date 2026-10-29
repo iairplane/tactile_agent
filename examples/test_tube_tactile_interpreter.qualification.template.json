@@ -1,0 +1,109 @@
+{
+  "schema": "demo2gripper.test_tube_tactile_interpreter_qualification.v1",
+  "status": "draft",
+  "runtime_qualified": false,
+  "qualification_id": "FILL_AFTER_SAME_SESSION_QUALIFICATION",
+  "session_id": "FILL_FROM_CONTACT_BOOTSTRAP",
+  "serial_side_mapping": {
+    "FILL_LEFT_SERIAL": "left",
+    "FILL_RIGHT_SERIAL": "right"
+  },
+  "target_axis_base": [1.0, 0.0, 0.0],
+  "rotation_stop": {
+    "runtime_qualified": false,
+    "maximum_axis_delta_deg": 1.0,
+    "confirmation_windows": 2
+  },
+  "contact_profile": {
+    "profile_id": "FILL_FROM_POSITIVE_CONTACT_BOOTSTRAP",
+    "session_evidence_sha256": "FILL_64_HEX_DIGEST",
+    "engage_threshold_sensor_units": 0.0,
+    "retain_threshold_sensor_units": 0.0,
+    "config": {
+      "min_unique_samples": 5,
+      "min_calibration_windows_per_stage": 3,
+      "max_age_s": 0.2,
+      "max_pair_skew_s": 0.08,
+      "minimum_fz_change_sensor_units": 0.001,
+      "minimum_threshold_floor_sensor_units": 0.001,
+      "positive_margin_noise_multiplier": 8.0,
+      "threshold_noise_multiplier": 6.0,
+      "minimum_consistent_positive_fraction": 0.6666666666666666,
+      "engage_fraction_of_positive": 0.25,
+      "retain_fraction_of_positive": 0.1,
+      "contact_confirmation_windows": 2,
+      "loss_confirmation_windows": 2
+    },
+    "fingers": [
+      {
+        "serial": "FILL_LEFT_SERIAL",
+        "calibration_id": "FILL_CURRENT_GF220_CALIBRATION_ID",
+        "unloaded_fz_sensor_units": 0.0,
+        "unloaded_noise_sensor_units": 0.0,
+        "positive_fz_sensor_units": 0.0,
+        "positive_delta_sensor_units": 0.0,
+        "positive_support_windows": 0,
+        "positive_total_windows": 0,
+        "contact_response_qualified": false,
+        "last_bootstrap_sdk_time_s": 0.0,
+        "last_bootstrap_capture_time_s": 0.0
+      },
+      {
+        "serial": "FILL_RIGHT_SERIAL",
+        "calibration_id": "FILL_CURRENT_GF220_CALIBRATION_ID",
+        "unloaded_fz_sensor_units": 0.0,
+        "unloaded_noise_sensor_units": 0.0,
+        "positive_fz_sensor_units": 0.0,
+        "positive_delta_sensor_units": 0.0,
+        "positive_support_windows": 0,
+        "positive_total_windows": 0,
+        "contact_response_qualified": false,
+        "last_bootstrap_sdk_time_s": 0.0,
+        "last_bootstrap_capture_time_s": 0.0
+      }
+    ]
+  },
+  "controller": {
+    "profile_id": "FILL_REVIEWED_CONTROLLER_PROFILE_ID",
+    "retained_width_min_m": 0.0,
+    "retained_width_max_m": 0.05,
+    "axis_runtime_qualified": false,
+    "slip_runtime_qualified": false,
+    "min_unique_image_samples": 4,
+    "max_age_s": 0.25,
+    "max_pair_skew_s": 0.08,
+    "future_tolerance_s": 1e-06,
+    "bilateral_confirmation_windows": 2,
+    "target_axis_tolerance_deg": 5.0,
+    "axis_confirmation_windows": 4,
+    "max_pad_axis_disagreement_deg": 10.0,
+    "slip_center_shift_threshold_px": 4.0,
+    "slip_confirmation_windows": 2,
+    "fingers": [
+      {
+        "serial": "FILL_LEFT_SERIAL",
+        "calibration_id": "FILL_CURRENT_GF220_CALIBRATION_ID",
+        "roi_mask": "FILL_LEFT_ROI_MASK.npy",
+        "R_tcp_pad": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        "residual_threshold": 0.0,
+        "min_contact_area_px": 0,
+        "min_orientation_elongation": 1.6,
+        "min_orientation_concentration": 0.35,
+        "min_contact_frame_fraction": 0.6
+      },
+      {
+        "serial": "FILL_RIGHT_SERIAL",
+        "calibration_id": "FILL_CURRENT_GF220_CALIBRATION_ID",
+        "roi_mask": "FILL_RIGHT_ROI_MASK.npy",
+        "R_tcp_pad": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        "residual_threshold": 0.0,
+        "min_contact_area_px": 0,
+        "min_orientation_elongation": 1.6,
+        "min_orientation_concentration": 0.35,
+        "min_contact_frame_fraction": 0.6
+      }
+    ],
+    "jam": null
+  },
+  "wrench_adapter": null
+}

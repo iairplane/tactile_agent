@@ -4,14 +4,20 @@
 
 Bring this repository up on a new Ubuntu workstation connected to the Franka at
 `172.16.0.2`, then continue the pipeline from live RGB-D perception to a real-robot
-grasp. Work in three explicit levels:
+grasp. Track the legacy CAD path and the current no-CAD one-shot path explicitly:
 
 1. Core geometry and synthetic smoke test pass.
-2. Live RGB-D produces `T_camera_object.npy` and a reviewed Franka plan JSON.
-3. A compatible Franka driver executes the reviewed plan at low speed.
+2. Perception produces either (a) `T_camera_object.npy` plus a reviewed Franka plan for
+   the CAD path, or (b) a stable base-frame object anchor plus reviewed grounded and
+   execution candidates for the no-CAD path.
+3. A compatible Franka driver executes the corresponding reviewed target at low speed
+   and measured feedback verifies the result.
 
-Do not report level 3 complete when the repository has only generated a plan. The
-current repository does not contain a real-robot executor.
+Do not report level 3 complete when the repository has only generated a plan. A narrow
+level-3 path is now implemented and was completed once on 2026-10-21: FR3 + Hand-E,
+one supported tabletop die, translation-only grounding, deterministic pick through a
+40 mm lift. The generic `TaskSkill`/`AgentLoop` remains review-only. Read
+`docs/refined_real_robot_framework.md` before changing either path.
 
 ## Current system boundary
 
@@ -29,26 +35,51 @@ calibrated RGB-D human demonstration
   -> Isaac validation or Franka target-plan JSON
 ```
 
+The current real-robot extension is:
+
+```text
+one-time demonstration skill + live aligned RGB-D
+  -> stable supported-object anchor in the FR3 base frame
+  -> robot-specific canonical Hand-E TCP target
+  -> MoveIt pregrasp and absolute-TCP closed-loop descent
+  -> Hand-E close/contact check
+  -> measured 40 mm lift and post-lift holding check
+```
+
 What is already implemented:
 
 - Core object-frame intent inference and candidate ranking.
 - Disk adapters for SAM 3, SAM 2.1, RTMPose, WAPR, FoundationPose and GraspGenX.
+- A fail-closed RealSense RGB-D capture tool with depth-to-color alignment, metric
+  depth, intrinsics and hardware timestamps.
+- Fixed-camera ChArUco generation plus ambiguity-safe checkerboard support, read-only
+  paired camera/FR3 sample capture and an eye-to-hand solver with held-out validation.
+- A review-only agentic demonstration compiler with phase-labelled position paths,
+  explicit grounding anchors, continuity/support-clearance checks and preview output.
+- A plan-only decision loop with named stage predicates, replan/cancel/recovery states
+  and an execution gate embedded in the skill contract.
 - Isaac Lab `PREGRASP -> APPROACH -> CLOSE -> LIFT -> HOLD` validation.
 - Stock Panda Hand target composition in `src/demo2gripper/franka.py`.
 - Plan generation in `scripts/prepare_franka_panda_plan.py`.
+- A fixed fail-closed FR3 + Hand-E runner in `scripts/run_autonomous_pick.py`, including
+  MoveIt planning/execution, absolute-TCP descent correction, gripper feedback, recovery
+  and atomic per-stage evidence.
 
 What is not implemented:
 
-- A live RGB-D camera driver.
-- Hand-eye calibration acquisition.
 - Panda IK/collision/force-closure filtering before final candidate selection.
-- A libfranka/franka_ros2/MoveIt executor or gripper command sender.
+- A generic ROS 2/MoveIt executor that consumes arbitrary `TaskSkill` stages.
+- Real execution of `PLACE`, `RELEASE` and `RETREAT` from the demonstration skill.
+- Hand-E/adapter/finger URDF/SRDF collision geometry and measured payload/centre of mass.
+- Object rotation retargeting, clutter/multi-target semantics and continuous visual servo.
 - Splat2Act/3DGS scene reconstruction.
 
-The existing Panda conversion assumes a stock Franka Hand, command frame
+The legacy Panda conversion assumes a stock Franka Hand, command frame
 `panda_hand`, `0.1034 m` hand-to-TCP offset and a fixed `Rz(-90 deg)` frame rotation.
-Do not use that mapping for a Robotiq or another end effector; measure its TCP and
-implement the corresponding gripper contract first.
+Do not use that mapping for the current Hand-E. Its present working transform is
+identity rotation plus 0.190 m along link8 Z, recorded in
+`calibration/T_link8_canonical_tcp.json`. The rotation was cross-checked from RGB-D and
+URDF evidence; the 0.190 m distance remains measured/assumed and installation-specific.
 
 ## Repository map
 
@@ -287,12 +318,18 @@ human-intent/GraspGenX top K
   -> final candidate
 ```
 
-### 8. Implement and stage the missing executor
+### 8. Operate and extend the current executor
 
-Use the compatible ROS 2/MoveIt stack to consume `panda_hand_targets` from the reviewed
-plan JSON. Send pregrasp, grasp and lift as planned Cartesian/joint trajectories and use
-the official Franka gripper action for open/grasp. Keep perception and robot execution
-as separate processes joined by the plan file until the first real grasp succeeds.
+For the current FR3 + Hand-E experiment, use `scripts/run_autonomous_pick.py` and the
+contracts in `docs/refined_real_robot_framework.md`. It keeps RealSense, core geometry,
+ROS/MoveIt and Hand-E in separate processes and records every stage in
+`stage_report.json`. Default mode stops after observation, grounding and plan-only;
+physical stages require both `--execute` and `--accept-arm-only-collision-model`.
+
+Do not route an arbitrary `TaskSkill` into this runner. It currently implements only
+the fixed `OBSERVE -> GROUND -> PLAN -> PREGRASP -> DESCEND -> CLOSE -> VERIFY_CONTACT
+-> LIFT` sequence. Extend the same predicate and recovery structure before enabling
+place, release or retreat.
 
 Stage the first motion with the operator present, the emergency stop reachable, a clear
 workspace, low speed and conservative contact/grasp settings:
@@ -302,7 +339,7 @@ workspace, low speed and conservative contact/grasp settings:
 3. Execute pregrasp only.
 4. Execute approach without closing.
 5. Test gripper open/close away from the object.
-6. Execute grasp with a short lift.
+6. Execute grasp with a short lift and retain the complete stage report.
 
 Do not automatically unlock joints, enable FCI or start physical motion. Those are
 operator actions. Once the operator explicitly authorizes a stage, execute it and save
@@ -312,10 +349,14 @@ the planned and measured poses plus the outcome.
 
 - **Level 1:** core environment installs, tests pass, and the synthetic intent/candidate
   files are produced.
-- **Level 2:** a real aligned RGB-D frame produces a visually checked object mask,
-  `T_camera_object.npy`, and `franka_plan.json` using a measured `T_base_camera`.
-- **Level 3:** the compatible driver reports robot state, MoveIt finds collision-free
-  trajectories, the stock hand executes open/grasp, and the object is lifted and held.
+- **Level 2:** real aligned RGB-D produces either a visually checked
+  `T_camera_object.npy` and `franka_plan.json` for the CAD path, or a stable supported
+  object anchor plus grounded/execution candidate artifacts for the no-CAD path. Both
+  use the measured `T_base_camera`.
+- **Level 3:** the compatible driver reports robot state, MoveIt finds a trajectory, the
+  installed gripper executes open/grasp, and measured feedback confirms that the object
+  is lifted and held. For the current narrow setup, Run 05 is the first such result; it
+  is not evidence of generic object or full-task execution.
 
 Report the first failing boundary directly. Do not replace a failed physical result with
 a generated visualization or simulator-oracle result.

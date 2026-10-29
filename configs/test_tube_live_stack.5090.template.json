@@ -1,0 +1,54 @@
+{
+  "schema": "demo2gripper.test_tube_live_stack.v1",
+  "task_config": "test_tube_closed_loop.online.template.json",
+  "startup_timeout_s": 90.0,
+  "f2g": {
+    "mode": "managed",
+    "start_argv": [
+      "ssh",
+      "-o",
+      "ExitOnForwardFailure=yes",
+      "-o",
+      "ServerAliveInterval=30",
+      "-L",
+      "8765:127.0.0.1:8765",
+      "5090-lzr",
+      "bash -lc 'source /home/lzr/code/f2g_pose_sm120_env.sh && cd /home/lzr/code/tactile_agent_f2g_service && CUDA_VISIBLE_DEVICES=${F2G_GPU:-6} exec \"$F2G_VENV/bin/python\" scripts/serve_f2g_pose.py --host 127.0.0.1 --port 8765 --checkpoint \"$F2G_ROOT/weights/f2g-pose.pt\" --radio-repository \"$F2G_RADIO_REPOSITORY\" --radio-checkpoint \"$F2G_RADIO_CHECKPOINT\" --f2g-root \"$F2G_ROOT\" --device cuda:0'"
+    ],
+    "deployment": {
+      "host": "5090-lzr",
+      "f2g_commit": "6141733a61d9a6e764bb0a72d2c5ecde06adc1db",
+      "radio_commit": "fbd19ec1e68483482d7d96a59cb639880a8b33ed",
+      "gpu_is_operator_selected": true,
+      "default_gpu_from_verified_probe_only": 6
+    }
+  },
+  "sam3": {
+    "mode": "managed",
+    "start_argv": [
+      "ssh",
+      "-o",
+      "ExitOnForwardFailure=yes",
+      "-o",
+      "ServerAliveInterval=30",
+      "-L",
+      "8766:127.0.0.1:8766",
+      "5090-lzr",
+      "bash -lc 'source /mnt/sdb/lzr/univtac/venvs/cap-x-agent0/bin/activate && cd /home/lzr/code/tactile_agent_f2g_service && CUDA_VISIBLE_DEVICES=${SAM3_GPU:-6} exec python scripts/serve_sam3_masks.py --host 127.0.0.1 --port 8766 --model-root /mnt/sdb/lzr/univtac/worktrees/cap-x-agent0/capx/third_party/sam3 --checkpoint /mnt/sdb/lzr/univtac/models/sam3/sam3.pt --device cuda:0'"
+    ],
+    "deployment": {
+      "host": "5090-lzr",
+      "service_port": 8766,
+      "gpu_is_operator_selected": true,
+      "default_gpu_from_current_workstation_mapping": 6
+    }
+  },
+  "servo": {
+    "mode": "managed",
+    "start_argv": [
+      "scripts/start_fr3_moveit_servo_stack.sh",
+      "--real"
+    ],
+    "auto_attach_servo_only_when_move_group_is_active": true
+  }
+}

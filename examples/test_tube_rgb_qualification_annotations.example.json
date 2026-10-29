@@ -1,0 +1,153 @@
+{
+  "schema": "demo2gripper.test_tube_rgb_qualification_annotations.v2",
+  "qualification_id": "replace-with-reviewed-session-id",
+  "trials": [
+    {
+      "trial_id": "robot_held_01",
+      "recording_session_id": "0f39ce79b1d74e8f8b02561d7998c001",
+      "run_dir": "../runs/live/test_tube_robot_held_trial_01",
+      "pivot": {
+        "frame_interval_inclusive": [0, 30],
+        "roi_uvxy": [100, 0, 430, 230],
+        "seed": {
+          "frame": 0,
+          "line_uv": [[190.0, 190.0], [310.0, 70.0]]
+        },
+        "visible_intervals_inclusive": [[0, 30]],
+        "reviewed_axis_labels": [
+          {"frame": 0, "axis_angle_deg": 135.0},
+          {"frame": 5, "axis_angle_deg": 137.0},
+          {"frame": 10, "axis_angle_deg": 139.0},
+          {"frame": 15, "axis_angle_deg": 141.0},
+          {"frame": 20, "axis_angle_deg": 138.0},
+          {"frame": 25, "axis_angle_deg": 135.5},
+          {"frame": 30, "axis_angle_deg": 135.0}
+        ],
+        "labelled_reclamp_frame": 25,
+        "earliest_allowed_reclamp_frame": 23
+      },
+      "negative_cases": [
+        {
+          "case_id": "occlusion_01",
+          "kind": "partial_occlusion",
+          "replay_interval_inclusive": [31, 38],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 31,
+            "line_uv": [[190.0, 190.0], [310.0, 70.0]]
+          },
+          "evaluation_frames": [33, 34, 35, 36, 37, 38]
+        },
+        {
+          "case_id": "ambiguity_01",
+          "kind": "distractor_ambiguity",
+          "replay_interval_inclusive": [39, 45],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 39,
+            "line_uv": [[190.0, 190.0], [310.0, 70.0]]
+          },
+          "evaluation_frames": [40, 41, 42]
+        }
+      ]
+    },
+    {
+      "trial_id": "robot_held_02",
+      "recording_session_id": "28e955107d8d4cacadb45131a2331002",
+      "run_dir": "../runs/live/test_tube_robot_held_trial_02",
+      "pivot": {
+        "frame_interval_inclusive": [0, 30],
+        "roi_uvxy": [100, 0, 430, 230],
+        "seed": {
+          "frame": 0,
+          "line_uv": [[180.0, 185.0], [315.0, 65.0]]
+        },
+        "visible_intervals_inclusive": [[0, 30]],
+        "reviewed_axis_labels": [
+          {"frame": 0, "axis_angle_deg": 138.4},
+          {"frame": 5, "axis_angle_deg": 140.0},
+          {"frame": 10, "axis_angle_deg": 141.0},
+          {"frame": 15, "axis_angle_deg": 140.0},
+          {"frame": 20, "axis_angle_deg": 138.0},
+          {"frame": 25, "axis_angle_deg": 135.5},
+          {"frame": 30, "axis_angle_deg": 135.0}
+        ],
+        "labelled_reclamp_frame": 25,
+        "earliest_allowed_reclamp_frame": 23
+      },
+      "negative_cases": [
+        {
+          "case_id": "occlusion_02",
+          "kind": "partial_occlusion",
+          "replay_interval_inclusive": [31, 38],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 31,
+            "line_uv": [[180.0, 185.0], [315.0, 65.0]]
+          },
+          "evaluation_frames": [33, 34, 35, 36, 37, 38]
+        },
+        {
+          "case_id": "ambiguity_02",
+          "kind": "distractor_ambiguity",
+          "replay_interval_inclusive": [39, 45],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 39,
+            "line_uv": [[180.0, 185.0], [315.0, 65.0]]
+          },
+          "evaluation_frames": [40, 41, 42]
+        }
+      ]
+    },
+    {
+      "trial_id": "robot_held_03",
+      "recording_session_id": "1de6766723234495962e58c7e0261003",
+      "run_dir": "../runs/live/test_tube_robot_held_trial_03",
+      "pivot": {
+        "frame_interval_inclusive": [0, 30],
+        "roi_uvxy": [100, 0, 430, 230],
+        "seed": {
+          "frame": 0,
+          "line_uv": [[200.0, 195.0], [305.0, 60.0]]
+        },
+        "visible_intervals_inclusive": [[0, 30]],
+        "reviewed_axis_labels": [
+          {"frame": 0, "axis_angle_deg": 127.9},
+          {"frame": 5, "axis_angle_deg": 130.0},
+          {"frame": 10, "axis_angle_deg": 132.0},
+          {"frame": 15, "axis_angle_deg": 134.0},
+          {"frame": 20, "axis_angle_deg": 135.0},
+          {"frame": 25, "axis_angle_deg": 135.5},
+          {"frame": 30, "axis_angle_deg": 135.0}
+        ],
+        "labelled_reclamp_frame": 25,
+        "earliest_allowed_reclamp_frame": 23
+      },
+      "negative_cases": [
+        {
+          "case_id": "occlusion_03",
+          "kind": "partial_occlusion",
+          "replay_interval_inclusive": [31, 38],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 31,
+            "line_uv": [[200.0, 195.0], [305.0, 60.0]]
+          },
+          "evaluation_frames": [33, 34, 35, 36, 37, 38]
+        },
+        {
+          "case_id": "ambiguity_03",
+          "kind": "distractor_ambiguity",
+          "replay_interval_inclusive": [39, 45],
+          "roi_uvxy": [100, 0, 430, 230],
+          "seed": {
+            "frame": 39,
+            "line_uv": [[200.0, 195.0], [305.0, 60.0]]
+          },
+          "evaluation_frames": [40, 41, 42]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "demo2gripper.test_tube_source_seed_qualification.v1",
+  "status": "draft",
+  "runtime_qualified": false,
+  "qualification_id": null,
+  "workspace_calibration_id": null,
+  "camera_extrinsic_qualification_id": null,
+  "camera_serial": "254622073804",
+  "intrinsics_sha256": null,
+  "seed_rgb_sha256": null,
+  "reviewed_mask_sha256": null,
+  "reviewed_open_uv": null,
+  "reviewed_closed_uv": null,
+  "reviewed_endpoints_evidence_id": null
+}

@@ -1,0 +1,264 @@
+{
+  "schema": "demo2gripper.test_tube_closed_loop_config.v1",
+  "task_id": "test-tube-demo06-seven-stage-online",
+  "execution_scope": "live_candidate",
+  "geometry": {
+    "relation_id": "test-tube-demo06-top-pinch-runtime-grounded",
+    "relation_source": "demo06-effective-frames-1068-1300-reviewed-image-relation",
+    "relation_runtime_qualified": true,
+    "T_tube_tcp_demo_grasp": null,
+    "normalized_demo_grasp": {
+      "axial_fraction_closed_to_open": 0.946211793228851,
+      "tube_length_m": null,
+      "tube_length_source": "runtime_f2g_size",
+      "preferred_jaw_axis_base": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "top_approach_direction_base": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "tube_pose_origin": "geometric_centre",
+      "tube_axis_contract": "closed_to_open"
+    },
+    "socket_entry_source": "online_rgbd_entry_frame",
+    "socket_entry_runtime_qualified": true,
+    "T_socket_tube_entry": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "tube_axis_tube": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "socket_outward_axis_socket": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "pose_backend": {
+    "name": "external",
+    "service_url": "http://127.0.0.1:8765",
+    "service_backend_name": "f2g_pose",
+    "adapter": "demo2gripper.test_tube_live_io:create_live_io",
+    "qualification_receipt": null,
+    "source_qualification_receipt": null,
+    "timeout_s": 0.25,
+    "max_staleness_s": 0.25,
+    "max_server_latency_s": 0.2,
+    "max_roundtrip_latency_s": 0.25
+  },
+  "live_adapter": {
+    "schema": "demo2gripper.test_tube_live_io.v1",
+    "demo_relation_qualification_receipt": null,
+    "camera": {
+      "serial": "254622073804",
+      "camera_extrinsic": "runs/live/test_tube_camera_return_check_20261024_03/analysis/T_base_camera_current_provisional.npy",
+      "camera_extrinsic_qualification_receipt": null,
+      "width": 640,
+      "height": 480,
+      "fps": 15,
+      "warmup_frames": 15,
+      "frame_timeout_ms": 1000,
+      "provisional_camera_recovery_report": "runs/live/test_tube_camera_return_check_20261024_03/analysis/current_camera_provisional_recovery.json"
+    },
+    "scene_interpreter": {
+      "factory": "demo2gripper.test_tube_online_scene:create_online_test_tube_scene_interpreter",
+      "qualification_receipt": null,
+      "config": {
+        "sam3_service_url": "http://127.0.0.1:8766",
+        "sam3_timeout_s": 4.0,
+        "tube_prompt": "test tube",
+        "tracking_id": "test-tube-current-session",
+        "tube_bootstrap": {
+          "min_tube_score": 0.05,
+          "min_stable_frames": 3,
+          "min_consecutive_mask_iou": 0.72,
+          "max_endpoint_jitter_px": 8.0,
+          "source_roi_uvxy": [
+            390,
+            220,
+            560,
+            410
+          ],
+          "min_support_score": 0.7,
+          "min_support_assignment_margin_px": 40.0,
+          "max_near_support_distance_px": 60.0,
+          "max_tube_support_overlap_fraction": 0.3,
+          "min_support_mask_pixels": 200,
+          "support_roi_uvxy": [
+            320,
+            350,
+            455,
+            480
+          ],
+          "support_anchor_uv": null,
+          "allow_qualified_base_z_fallback": true,
+          "endpoint_depth_radius_px": 7,
+          "min_base_z_separation_m": 0.025
+        },
+        "mask_tracker": {},
+        "foreground_depth": {},
+        "pose_qualifier": {},
+        "size_qualifier": {
+          "min_stable_frames": 3,
+          "min_length_m": 0.03,
+          "max_length_m": 0.3,
+          "min_aspect_ratio": 1.5,
+          "max_cross_section_ratio": 1.8,
+          "max_relative_window_deviation": 0.15
+        },
+        "downstream_factory": "demo2gripper.test_tube_online_socket:create_online_socket_scene_interpreter",
+        "downstream_config": {
+          "tracker": {
+            "min_stable_frames": 4,
+            "target_hint_uv": [
+              293.0,
+              315.0
+            ],
+            "max_age_s": 0.25,
+            "max_target_hint_distance_px": 25.0
+          },
+          "hough": {
+            "roi_uvxy": [
+              255,
+              280,
+              335,
+              355
+            ],
+            "min_radius_px": 4,
+            "max_radius_px": 18
+          },
+          "downstream_factory": "demo2gripper.test_tube_downstream_scene:create_online_held_tube_scene_interpreter",
+          "downstream_config": {
+            "axis_roi_uvxy": [
+              0,
+              0,
+              640,
+              480
+            ],
+            "tracking_id": "test-tube-current-session",
+            "tracker": {},
+            "hough": {},
+            "angle_gate": {
+              "target_image_axis_deg": 136.71493019552653,
+              "tolerance_deg": 8.0,
+              "min_consecutive_frames": 3,
+              "max_rate_deg_s": 120.0
+            },
+            "policy": {
+              "tube_length_m": null,
+              "extract_clearance_m": 0.03,
+              "insertion_target_depth_m": null
+            }
+          }
+        },
+        "source_support_prompt": "white paper cup"
+      }
+    },
+    "socket": {
+      "mode": "online_entry_frame",
+      "runtime_qualification_id": "online-rgbd-socket-entry-v1",
+      "max_position_std_m": 0.004,
+      "max_orientation_std_deg": 4.0
+    },
+    "tactile": {
+      "gf220_profile": "configs/gf220_manual_warp_draft.json",
+      "factory": "demo2gripper.test_tube_tactile_interpreter:create_session_bootstrap_tactile_interpreter",
+      "qualification_receipt": null,
+      "config": {},
+      "hande_port": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AQ00O97B-if00-port0",
+      "modbus_timeout_s": 0.12,
+      "startup_timeout_s": 15.0,
+      "calibration_timeout_s": 15.0,
+      "runtime_samples": 4,
+      "runtime_timeout_s": 0.25
+    },
+    "robot": {
+      "base_frame": "fr3_link0",
+      "link8_frame": "fr3_link8",
+      "joint_topic": "/joint_states",
+      "tcp": "calibration/T_link8_canonical_tcp.npy",
+      "tcp_qualification_receipt": null,
+      "collision_payload_qualification_receipt": null,
+      "moveit": {
+        "pose_goal_script": "scripts/moveit_pose_goal.py",
+        "setup_scripts": [
+          "/opt/ros/jazzy/setup.bash",
+          "third_party/franka_ros2_ws/install_ros/setup.bash"
+        ],
+        "velocity_scale": 0.03,
+        "acceleration_scale": 0.03,
+        "command_timeout_s": 60.0
+      },
+      "servo": {
+        "node_name": "/servo_node",
+        "twist_topic": "/servo_node/delta_twist_cmds",
+        "status_topic": "/servo_node/status",
+        "switch_command_type_service": "/servo_node/switch_command_type",
+        "pause_service": "/servo_node/pause_servo",
+        "command_period_s": 0.02,
+        "command_horizon_s": 0.1,
+        "max_linear_m_s": 0.08,
+        "max_angular_rad_s": 0.8,
+        "position_tolerance_m": 0.0015,
+        "rotation_tolerance_rad": 0.0261799388
+      },
+      "tcp_static_calibration": "calibration/T_link8_canonical_tcp.json",
+      "tcp_installation_id": "fr3-hande-installation-20261021",
+      "tcp_position_bound_m": 0.005,
+      "tcp_orientation_bound_deg": 3.0
+    }
+  },
+  "policy": {
+    "level_axis_tolerance_deg": 4.0,
+    "level_min_horizontal_projection": 0.1,
+    "level_settle_windows": 3,
+    "insertion_target_depth_m": null,
+    "insertion_max_travel_m": 0.03
+  },
+  "demonstration": {
+    "schema": "demo2gripper.test_tube_execution_demonstration.v1",
+    "recording": "runs/live/test_tube_demo_20261024_06",
+    "effective_interval": "runs/live/test_tube_demo_20261024_06/analysis/effective_demo_interval.json",
+    "effective_index": "runs/live/test_tube_demo_20261024_06/analysis/effective_demo_index.json",
+    "stage_review": "runs/live/test_tube_demo_20261024_06/analysis/stage_review.refined.json",
+    "execution_plan": "runs/live/test_tube_demo_20261024_06/analysis/robot_execution_plan.json",
+    "frame_interval": [
+      1068,
+      1300
+    ],
+    "stage_count": 7,
+    "source_axis_sign_primitive_qualified": true,
+    "post_extract_level_controller_available": true,
+    "source_axis_sign_qualification_evidence": "runs/live/test_tube_demo_20261024_06/analysis/source_axis_sign_qualification.json",
+    "post_extract_level_controller_evidence": "runs/live/test_tube_demo_20261024_06/analysis/level_held_tube_qualification.json"
+  }
+}

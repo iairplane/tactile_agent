@@ -1,0 +1,148 @@
+{
+  "schema": "demo2gripper.medicine_bottle_task_config.v1",
+  "repo_root": "..",
+  "inputs": {
+    "cap_frame": "../runs/live/medicine_bottle_execution_20261023_01/localization_execute/medicine_bottle_cap_frame_robot_aligned.json",
+    "T_link8_configured_ee": "../calibration/T_link8_canonical_tcp.npy"
+  },
+  "commands": {
+    "moveit_pose": [
+      "scripts/run_ros_python.sh",
+      "scripts/moveit_pose_goal.py"
+    ],
+    "moveit_sequence": [
+      "scripts/run_ros_python.sh",
+      "scripts/moveit_cartesian_pose_sequence.py"
+    ],
+    "hande": [
+      "/home/vitai/miniconda3/envs/fhh/bin/python",
+      "scripts/hande_modbus_cli.py"
+    ]
+  },
+  "grasp": {
+    "orientation_xyzw": [
+      -0.374944558450502,
+      0.9270472361688794,
+      0.0,
+      0.0
+    ],
+    "bottle_axis_tcp": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "approach_standoff_m": 0.025,
+    "fixture_verified": true,
+    "orientation_reviewed": true
+  },
+  "press": {
+    "initial_distance_m": 0.002,
+    "retry_increment_m": 0.001,
+    "max_retries": 2,
+    "max_confirm_windows": 3
+  },
+  "twist": {
+    "step_angle_deg": 10.0,
+    "max_steps": 108,
+    "batch_steps": 6,
+    "thread_pitch_m_per_revolution": 0.003,
+    "downfeed_m_per_revolution": 0.002,
+    "downfeed_revolutions": 1.0,
+    "minimum_release_revolutions": 1.0,
+    "max_axial_upfeed_m": 0.008,
+    "velocity_scale": 0.05,
+    "acceleration_scale": 0.05,
+    "max_cartesian_speed_m_s": 0.015,
+    "tactile": {
+      "profile_id": "medicine-cap-gf220-draft.v1",
+      "min_unique_samples": 4,
+      "max_age_s": 0.6,
+      "max_pair_skew_s": 0.15,
+      "min_window_span_s": 0.06,
+      "baseline_axis_alignment_cosine": 0.999,
+      "press_reaction_sign": 1,
+      "press_engage_sum_z": 5.0,
+      "press_retain_sum_z": 2.5,
+      "press_engage_finger_z": 2.5,
+      "press_retain_finger_z": 1.25,
+      "max_press_imbalance_enter": 0.45,
+      "max_press_imbalance_retain": 0.65,
+      "max_press_range_z": 8.0,
+      "press_required_consecutive_windows": 2,
+      "engage_drive_z": 5.0,
+      "retain_drive_z": 2.5,
+      "engage_moment_z": 5.0,
+      "retain_moment_z": 2.5,
+      "engage_finger_z": 2.5,
+      "retain_finger_z": 1.25,
+      "max_imbalance_enter": 0.45,
+      "max_imbalance_retain": 0.65,
+      "release_drive_peak_fraction": 0.35,
+      "release_moment_peak_fraction": 0.25,
+      "release_min_peak_z": 6.0,
+      "release_consecutive_windows": 2,
+      "wrist_reset_fraction": 0.9,
+      "unload_return_z": 2.5
+    }
+  },
+  "wrist": {
+    "travel_limit_deg": 60.0
+  },
+  "regrasp": {
+    "max_cycles": 17,
+    "unload_opening_mm": 50.0,
+    "grasp_opening_mm": 18.0,
+    "max_unload_windows": 3
+  },
+  "release_verify": {
+    "axial_test_lift_m": 0.002,
+    "max_axis_force_delta_n": 1.0,
+    "max_tangential_delta_n": 1.0
+  },
+  "hande": {
+    "port": "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AQ00O97B-if00-port0",
+    "open_width_mm": 50.0,
+    "grasp_width_mm": 18.0,
+    "speed_register": 15,
+    "force_register": 10,
+    "timeout_s": 8.0
+  },
+  "gf220": {
+    "manual_warp_profile": "gf220_manual_warp_draft.json",
+    "wrench_transform_profile": "gf220_wrench_transform_draft.json",
+    "live": {
+      "buffer_frames": 32,
+      "warmup_frames": 8,
+      "warp_validation_frames": 2,
+      "discovery_retries": 10,
+      "discovery_retry_delay_s": 0.5,
+      "cached_poll_delay_s": 0.002,
+      "sdk_timestamp_scale_s": 0.001,
+      "max_frame_age_s": 0.6,
+      "max_pair_skew_s": 0.15,
+      "close_timeout_s": 3.0
+    },
+    "startup_timeout_s": 15.0,
+    "calibration_timeout_s": 15.0,
+    "window_timeout_s": 2.0
+  },
+  "motion": {
+    "lift_distance_m": 0.03,
+    "velocity_scale": 0.02,
+    "acceleration_scale": 0.02,
+    "max_cartesian_speed_m_s": 0.008,
+    "max_step_m": 0.001,
+    "jump_threshold": 2.0,
+    "revolute_jump_threshold_rad": 0.1,
+    "planning_time_s": 8.0,
+    "planning_attempts": 5,
+    "server_timeout_s": 15.0,
+    "max_pose_translation_m": 0.6,
+    "max_pose_rotation_rad": 3.141592653589793,
+    "position_tolerance_m": 0.001,
+    "orientation_tolerance_rad": 0.02,
+    "min_joint_limit_margin_rad": 0.05,
+    "max_joint_sweep_rad": 2.0,
+    "max_total_joint_sweep_rad": 6.0
+  }
+}

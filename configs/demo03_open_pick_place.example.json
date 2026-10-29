@@ -1,0 +1,40 @@
+{
+  "schema": "demo2gripper.demo03_open_pick_place_config.v1",
+  "pick_config": "../runs/live/full_chain_demo_20261022_03/multicontact_plan/inputs/die_pick_config.json",
+  "commands": {
+    "pick": [
+      ".venv/bin/python",
+      "scripts/run_autonomous_pick.py"
+    ],
+    "pose_sequence": [
+      "scripts/run_ros_python.sh",
+      "scripts/moveit_cartesian_pose_sequence.py"
+    ]
+  },
+  "lid_two_stage": {
+    "manifest": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/waypoint_manifest.json",
+    "connected_plan_only": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/connected_plan_only.json",
+    "stage1_precontact_tcp": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage1_precontact_tcp.json",
+    "stage1_contact_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage1_contact_approach_waypoints.json",
+    "stage1_contact_tcp": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage1_contact_tcp.json",
+    "stage1_open_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage1_open_to_61deg_waypoints.json",
+    "stage1_retreat_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage1_release_retreat_waypoints.json",
+    "stage2_free_space_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_regrasp_free_space_approach_waypoints.json",
+    "stage2_precontact_tcp": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_regrasp_precontact_tcp.json",
+    "stage2_contact_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_regrasp_approach_waypoints.json",
+    "stage2_contact_tcp": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_regrasp_contact_tcp.json",
+    "stage2_open_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_open_61_to_100deg_waypoints.json",
+    "stage2_retreat_waypoints": "../runs/live/full_chain_demo_20261022_03/lid_two_stage_robot_adapted_v1/stage2_release_retreat_waypoints.json",
+    "min_contact_opening_m": 0.002,
+    "max_contact_opening_m": 0.048
+  },
+  "placement": {
+    "relation": "../runs/live/full_chain_demo_20261022_03/multicontact_plan/inputs/box_placement_relation.json",
+    "transport_height_m": 0.08,
+    "retreat_height_m": 0.08
+  },
+  "motion": {
+    "pose_sequence_speed_m_s": 0.015,
+    "pose_sequence_max_step_m": 0.005
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "demo2gripper.test_tube_front_rgb_pivot_reference.v1",
+  "status": "reviewed_same_camera_demo_reference",
+  "runtime_gate_eligible": false,
+  "camera": {
+    "serial": "254622073804",
+    "intrinsics_sha256": "cbc40d1b8851e6f170ead484e7977d1877d5caeabacba0b01eb396b658b3a024",
+    "resolution": [
+      640,
+      480
+    ],
+    "mount_requirement": "fixed_and_unchanged"
+  },
+  "angle_convention": "undirected image axis in [0,180), +u right, +v down",
+  "source": {
+    "stage_review": "runs/live/test_tube_demo_20261023_02/analysis/stage_plan_refined.json",
+    "stage_review_sha256": "7d0518496e83cf783f2e85086d4ea9eeee78c07192857fafa622dfd97516c407",
+    "axis_trace": "runs/live/test_tube_demo_20261023_02/analysis/tube_axis_image_trace.csv",
+    "axis_trace_sha256": "a386f460372a78d22cfc93764ae43551e1ba29b6796ae586c48e0aa721481386",
+    "frame": 330,
+    "line_uv": [
+      [
+        223.0,
+        135.0
+      ],
+      [
+        338.0,
+        22.0
+      ]
+    ]
+  },
+  "target": {
+    "intent_angle_deg": 45.0,
+    "target_image_axis_deg": 135.50258166672103,
+    "tolerance_deg": 5.0,
+    "min_consecutive_frames": 4,
+    "max_rate_deg_s": 120.0
+  },
+  "physical_3d_angle_claimed": false,
+  "runtime_requirements": [
+    "same fixed camera serial/intrinsics/mount",
+    "validated live tube mask or paired-edge points",
+    "valid PCA axis observation",
+    "four consecutive in-band frames"
+  ],
+  "remaining_blocker": "live tube-axis extractor has not been qualified on robot-held tube video",
+  "hardware_commands_dispatched": false,
+  "calibration_id": "test-tube-front-rgb-ce693992be053f54b28963acebedaa31122acb826b30b24ef804cb0c0186d87b"
+}

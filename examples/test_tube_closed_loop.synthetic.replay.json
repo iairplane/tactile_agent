@@ -1,0 +1,39 @@
+{
+  "schema": "demo2gripper.test_tube_closed_loop_replay.v1",
+  "synthetic": true,
+  "synthetic_scenario": "nominal_seven_stage_v1",
+  "purpose": "Exercise all seven stages, transitions, atomic receipts, and terminal completion without opening a device.",
+  "execution_eligible": false,
+  "pose_backend": {
+    "name": "synthetic_replay",
+    "available": true,
+    "runtime_qualified": true,
+    "qualification_id": "synthetic-fixture-only",
+    "capabilities": [
+      "metric_translation",
+      "full_se3",
+      "continuous_tracking",
+      "source_tube",
+      "in_hand_tube",
+      "socket_se3",
+      "image_axis",
+      "tube_ends_disambiguated"
+    ],
+    "detail": "deterministic replay fixture; never eligible for hardware execution"
+  },
+  "expected_actions": [
+    {"kind": "move_tcp"},
+    {"kind": "servo_tcp"},
+    {"kind": "start_continuous_close"},
+    {"kind": "stop_gripper"},
+    {"kind": "servo_tcp"},
+    {"kind": "open_gripper_step"},
+    {"kind": "reclamp"},
+    {"kind": "move_tcp"},
+    {"kind": "servo_tcp"},
+    {"kind": "insert_step"},
+    {"kind": "insert_step"},
+    {"kind": "open_release"},
+    {"kind": "move_tcp"}
+  ]
+}

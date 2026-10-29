@@ -1,0 +1,61 @@
+# MoveIt Servo 2.12.x parameters for the repository's arm-only FR3 stack.
+#
+# This file deliberately describes fr3_link8, because the installed upstream
+# URDF/SRDF does not yet contain the Hand-E, adapter, fingers, or canonical TCP.
+# Collision checking therefore protects the FR3 model and the MoveIt planning
+# scene only.  It must not be presented as a qualified Hand-E collision model.
+
+thread_priority: 40
+publish_period: 0.02
+max_expected_latency: 0.10
+
+move_group_name: fr3_arm
+active_subgroup: ""
+
+pose_command_in_topic: ~/pose_target_cmds
+cartesian_command_in_topic: ~/delta_twist_cmds
+joint_command_in_topic: ~/delta_joint_cmds
+command_in_type: speed_units
+scale:
+  linear: 0.08
+  rotational: 0.8
+  joint: 0.5
+incoming_command_timeout: 0.10
+apply_twist_commands_about_ee_frame: true
+
+pose_tracking:
+  linear_tolerance: 0.0015
+  angular_tolerance: 0.0261799388
+
+status_topic: ~/status
+command_out_topic: /fr3_arm_controller/joint_trajectory
+command_out_type: trajectory_msgs/JointTrajectory
+publish_joint_positions: true
+# The effort JointTrajectoryController rejects nonzero final velocities.
+# Position-only streaming uses its supported interpolation and holds the final
+# position if the stream stops, without weakening its end-velocity policy.
+publish_joint_velocities: false
+publish_joint_accelerations: false
+
+monitored_planning_scene_topic: /monitored_planning_scene
+joint_topic: /joint_states
+check_octomap_collisions: false
+is_primary_planning_scene_monitor: false
+
+use_smoothing: true
+smoothing_filter_plugin_name: online_signal_smoothing::ButterworthFilterPlugin
+
+check_collisions: true
+self_collision_proximity_threshold: 0.01
+scene_collision_proximity_threshold: 0.02
+collision_check_rate: 20.0
+
+lower_singularity_threshold: 17.0
+hard_stop_singularity_threshold: 30.0
+leaving_singularity_threshold_multiplier: 2.0
+singularity_step_scale: 0.01
+
+halt_all_joints_in_joint_mode: true
+halt_all_joints_in_cartesian_mode: true
+joint_limit_margins: [0.12]
+override_velocity_scaling_factor: 0.0

@@ -1,0 +1,161 @@
+{
+  "schema": "demo2gripper.test_tube_runtime_replay.v1",
+  "task_id": "test_tube_demo_20261023_02",
+  "synthetic": true,
+  "execution_eligible": false,
+  "purpose": "Fail-closed orchestration and JSON receipt example only; all transforms and profile identifiers below are synthetic.",
+  "max_steps": 4,
+  "max_grasp_close_probes": 2,
+  "live_geometry": {
+    "schema": "demo2gripper.test_tube_runtime_geometry.v1",
+    "task_id": "test_tube_demo_20261023_02",
+    "status": "synthetic_non_executable",
+    "freshness_verified": false,
+    "observation_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "metric_localization_receipt_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "collision_scene_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "contact_profile_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "front_rgb_tracker_session_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "insertion_jam_profile_id": "SYNTHETIC-DO-NOT-EXECUTE",
+    "transform_convention": "T_parent_child; metres; right-handed",
+    "T_base_tube": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "T_base_socket": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "T_tube_tcp_side_grasp": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "insertion_axis_base": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "insertion_target_depth_m": 0.001
+  },
+  "steps": [
+    {
+      "sequence": 0,
+      "state": "OBSERVE",
+      "evidence_id": "87c5de2b8058711eb00b0dc9646bfc9935fa1748a5a90202e0e2655c68c5712d",
+      "observed_at_s": 0.0,
+      "predicates": [
+        "socket_frame_valid",
+        "tube_pose_valid"
+      ],
+      "evidence_receipt": {
+        "schema": "demo2gripper.test_tube_predicate_receipt.v2",
+        "predicate_manifest_sha256": "12a898360b7e627fc1bf540000d7d07f0c05919cce1a1241cbca49a388e5c2cd",
+        "task_id": "test_tube_demo_20261023_02",
+        "session_id": "synthetic-replay-session",
+        "provenance_id": "synthetic-non-executable-fixture",
+        "state": "OBSERVE",
+        "evaluated_at_s": 0.0,
+        "producer_receipts": {
+          "scene": {
+            "receipt_id": "synthetic-scene-000",
+            "producer_id": "synthetic-scene-provider",
+            "observed_at_s": 0.0,
+            "qualification_id": null
+          }
+        },
+        "required_producers": [
+          "scene"
+        ],
+        "promoted_predicates": [
+          "socket_frame_valid",
+          "tube_pose_valid"
+        ],
+        "stale_receipt_ids": [],
+        "rejection_reasons": [],
+        "shadow_observations": {
+          "slip_shadow_candidate": false,
+          "jam_shadow_candidate": false
+        }
+      },
+      "expected": {
+        "event": "LIVE_FRAMES_READY",
+        "action": "request_agentic_approach_plan",
+        "next_state": "APPROACH_TUBE"
+      },
+      "action_result": {
+        "success": true,
+        "receipt_id": "synthetic-action-000",
+        "receipt": {
+          "semantic_only": true
+        },
+        "error": null
+      }
+    }
+  ]
+}

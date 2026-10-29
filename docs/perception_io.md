@@ -69,6 +69,133 @@ data/demo/
 - `K.npy` 是 OpenCV 针孔模型的 `3×3` 内参；深度必须已经对齐到 RGB。
 - 同一刚体的 CAD、WAPR 输出、CAD 表面点和 GraspGenX 输入必须共享原点、轴和尺度。
 
+### RealSense 在线采集
+
+使用固定相机的序列号选择设备，避免多台同型号相机在重启或重新插拔后选错：
+
+```bash
+/home/vitai/miniconda3/bin/python scripts/capture_realsense_rgbd.py \
+  --serial 254622073804 \
+  --output-dir runs/real/input \
+  --width 640 --height 480 --fps 30 \
+  --warmup-frames 30 --frames 300
+```
+
+脚本用 RealSense SDK 把 Z16 深度重投影到彩色光学坐标，按设备的深度比例转换为
+`float32` 米制 `.npy`，并从实际彩色流导出 `K.npy`。`timestamps_s.npy` 来自彩色帧的
+原始设备硬件时钟且严格递增；每帧的彩色/深度时间戳、帧号、有效深度比例和相机畸变
+参数另存于 `input_manifest.json`。输出目录必须为空。脚本依赖 `pyrealsense2` 和 OpenCV；
+本仓库核心环境不强制安装相机 SDK，以保持感知和机器人环境隔离。采集期间会强制检查彩色和
+深度的帧号、设备时间戳都持续递增，并限制两者的硬件时间差；重复或失同步的深度帧不会写入。
+脚本先写同目录下的临时目录，全部帧和 manifest 完成后才原子发布输出目录，因此
+`input_manifest.json` 的存在是一次完整采集的完成标记。
+
+### 固定外部相机到 FR3 基座的标定
+
+本机使用固定 D435（序列号 `254622073804`）时，标定目标是
+`calibration/T_base_camera.npy`：它把彩色光学相机坐标中的点变换到 FR3 基座坐标。
+本工作目录已经生成下列标定板；直接打印 PDF，不要对同一个非空输出目录重复运行生成器。
+在新的工作目录中若文件不存在，再运行：
+
+```bash
+/home/vitai/miniconda3/bin/python scripts/generate_charuco_board.py \
+  --output-dir outputs/charuco_7x5_30mm
+```
+
+打印 `outputs/charuco_7x5_30mm/charuco_board.pdf` 时选择“实际大小”或 `100%`，关闭
+“适合页面”和自动缩放。图案外框应为 `210 mm × 150 mm`，单格边长应为 `30 mm`，
+ArUco 标记边长应为 `22 mm`；打印后必须实测。把纸张完整贴在平整、刚性的背板上，
+再将背板刚性固定到末端法兰或 Hand-E。相机在全部样本采集和后续使用期间都不能相对
+FR3 基座移动，标定板在全部样本之间也不能相对法兰滑动，Hand-E 开口不能改变。
+
+也可以使用刚性普通棋盘格。先沿两个方向分别数**完整方格数**（不是内角点数），并实测
+单格边长；代码不会从照片猜物理尺寸。两个方格数必须一奇一偶，否则无标记棋盘格旋转
+`180°` 后无法唯一确定同一个物理角点顺序，不能用于本手眼标定。用实测值生成严格的
+版本化 metadata，例如：
+
+```bash
+SQUARES_X=填写横向完整方格数
+SQUARES_Y=填写纵向完整方格数
+SQUARE_LENGTH_MM=填写实测单格毫米数
+/home/vitai/miniconda3/bin/python scripts/create_checkerboard_metadata.py \
+  --squares-x "$SQUARES_X" \
+  --squares-y "$SQUARES_Y" \
+  --square-length-mm "$SQUARE_LENGTH_MM" \
+  --output runs/handeye/checkerboard_metadata.json
+```
+
+随后把采集命令的 `--board-metadata` 换成该文件。采集器使用
+`findChessboardCornersSBWithMeta` 的原生亚像素角点及黑白 meta 签名，要求全部内角点可见，
+并用 IPPE 的两个平面位姿候选检查歧义。板面不要接近平行于成像平面；若提示 planar pose
+ambiguous，增加倾斜角度后再采。
+
+操作者每次将机械臂置于一个静止姿态后，采集一个独立目录。脚本只读取 libfranka 状态，
+不会解锁、启动控制或发送运动命令：
+
+```bash
+/home/vitai/miniconda3/bin/python scripts/capture_handeye_sample.py \
+  --serial 254622073804 \
+  --board-metadata outputs/charuco_7x5_30mm/charuco_board.json \
+  --output-dir runs/handeye/dry_run \
+  --dry-run-camera-only
+
+/home/vitai/miniconda3/bin/python scripts/capture_handeye_sample.py \
+  --serial 254622073804 \
+  --board-metadata outputs/charuco_7x5_30mm/charuco_board.json \
+  --output-dir runs/handeye/samples/000 \
+  --session-id fr3-d435-fixed-01 \
+  --robot-hostname 172.16.0.2
+```
+
+当 MoveIt/`ros2_control` 已经连接 FR3 时，不要再启动第二个 libfranka reader。先加载
+与正在运行的驱动相同的 ROS overlay，再改用只读 state broadcaster 订阅：
+
+```bash
+source /opt/ros/jazzy/setup.bash
+source third_party/franka_ros2_ws/install_ros/setup.bash
+/home/vitai/miniconda3/bin/python scripts/capture_handeye_sample.py \
+  --serial 254622073804 \
+  --board-metadata outputs/charuco_7x5_30mm/charuco_board.json \
+  --output-dir runs/handeye/samples/000 \
+  --session-id fr3-d435-fixed-01 \
+  --ros-robot-state-topic
+```
+
+该模式只订阅 `/franka_robot_state_broadcaster/robot_state`，并按
+`T_base_flange = O_T_EE @ inverse(F_T_EE)` 生成与直接 libfranka 模式相同语义的
+`T_base_flange.npy`。broadcaster 必须处于 `active` 并持续发布新状态；仅有一条
+transient-local 缓存消息时采集会超时并拒绝落盘。
+
+依次把输出编号改为 `001`、`002`……，采集 `25` 个样本。让标定板覆盖画面中心、四角、
+近处和远处，并分别绕至少两个不平行轴改变约 `20–40°`；每次采集前完全停稳，同时确保
+至少 `12` 个 ChArUco 角点清晰可见；普通棋盘格则必须全部内角点清晰可见。脚本会拒绝运动中的机械臂、活动错误、失同步 RGB-D、
+重复帧、较差重投影和不完整输出。每个样本的 `overlay.png` 必须人工检查：角点和红绿蓝
+坐标轴应贴在实体板上。一次数据集的所有命令必须使用同一个 `--session-id`；它声明相机底座
+和板到法兰的安装关系没有改变。任一安装被触碰后应停止当前数据集，以新 session 和新目录重采。
+
+保留最后 `5` 个姿态作为独立验证集，再求解：
+
+```bash
+/home/vitai/miniconda3/bin/python - <<'PY'
+import cv2
+assert hasattr(cv2, "calibrateRobotWorldHandEye")
+assert hasattr(cv2, "calibrateHandEye")
+print(cv2.__version__)
+PY
+
+/home/vitai/miniconda3/bin/python scripts/solve_eye_to_hand.py runs/handeye/samples \
+  --validation-indices 20 21 22 23 24 \
+  --output-dir calibration
+```
+
+本机 Conda base 的 Python 同时提供 RealSense SDK、Pillow 和 OpenCV `4.13.0`，后者具备
+这两个求解接口；当前项目 `.venv` 中的 OpenCV `5.0.0` 不提供，不能用它运行求解命令。
+求解器会先拒绝混用不同 session、相机序列号、内参、畸变或标定板的样本，再同时比较
+SHAH、LI 和 PARK，检查运动多样性、
+训练闭合误差、保留样本误差与方法间一致性；任一默认阈值超限时不会发布结果。接受后输出
+`T_base_camera.npy`、标定板相对法兰的 `T_flange_board.npy` 和完整 `report.json`。只有
+`report.json` 中 `acceptance.accepted` 为 `true` 时才能使用该外参。
+
 ## SAM 3 / 3.1 文本目标分割
 
 `scripts/segment_sam3.py` 调官方 `build_sam3_image_model` 和 `Sam3Processor`，对每帧使用同一类别文本并保存最高分实例。输出布局为：
@@ -259,7 +386,8 @@ LD_LIBRARY_PATH="${D2G_NVIDIA_SITE}/cudnn/lib:${D2G_NVIDIA_SITE}/cublas/lib:${D2
 - `hand_keypoint_scores_2d.npy`：`(F,21) float32`，原始 SimCC 峰值，未归一化且可能大于 `1`；
 - `hand_joints_camera_m.npy`：`(F,21,3) float32`，逐关节 RGB-D 抬升结果；
 - `hand_joint_confidence.npy`：`(F,21) float32`，raw score 裁剪到 `[0,1]`，无有效深度时为 `0`；
-- `timestamps_s.npy`：`(F,) float64`，由 `--fps` 生成；
+- `timestamps_s.npy`：`(F,) float64`，由 `--fps` 生成的后端 fallback；真机融合应使用
+  RealSense 输入目录中的设备硬件时间戳；
 - `rtmpose_manifest.json`：模型、关键点顺序、score 合同、逐帧 bbox 和有效深度关节数。
 
 本次真实输出的逐帧叠加视频位于 `/mnt/sdb/lzr/demo2gripper_runs/dexycb_pudding_view06/hand_pose/sam2_rtmpose_rgbd.mp4`，同时显示 SAM 手/物体 mask、21 点骨架和有效 RGB-D 关节数。
@@ -275,7 +403,7 @@ python scripts/build_observations.py \
   --t-camera-object runs/real/wapr/T_camera_object.npy \
   --hand-joints-camera-m runs/real/hand_pose/hand_joints_camera_m.npy \
   --confidence runs/real/hand_pose/hand_joint_confidence.npy \
-  --timestamps-s runs/real/hand_pose/timestamps_s.npy \
+  --timestamps-s runs/real/input/timestamps_s.npy \
   --output runs/real/observations.npz
 ```
 

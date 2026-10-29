@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "demo2gripper.test_tube_rgb_qualification_annotations.v2",
+  "title": "Robot-held test-tube RGB tracker qualification annotations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "qualification_id", "trials"],
+  "properties": {
+    "schema": {
+      "const": "demo2gripper.test_tube_rgb_qualification_annotations.v2"
+    },
+    "qualification_id": {"type": "string", "minLength": 1},
+    "trials": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/trial"}
+    }
+  },
+  "$defs": {
+    "frameInterval": {
+      "type": "array",
+      "prefixItems": [
+        {"type": "integer", "minimum": 0},
+        {"type": "integer", "minimum": 0}
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "roi": {
+      "type": "array",
+      "items": {"type": "integer", "minimum": 0},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "lineUv": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {"type": "number"},
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame", "line_uv"],
+      "properties": {
+        "frame": {"type": "integer", "minimum": 0},
+        "line_uv": {"$ref": "#/$defs/lineUv"}
+      }
+    },
+    "axisLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame", "axis_angle_deg"],
+      "properties": {
+        "frame": {"type": "integer", "minimum": 0},
+        "axis_angle_deg": {"type": "number"}
+      }
+    },
+    "pivot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame_interval_inclusive",
+        "roi_uvxy",
+        "seed",
+        "visible_intervals_inclusive",
+        "reviewed_axis_labels",
+        "labelled_reclamp_frame",
+        "earliest_allowed_reclamp_frame"
+      ],
+      "properties": {
+        "frame_interval_inclusive": {"$ref": "#/$defs/frameInterval"},
+        "roi_uvxy": {"$ref": "#/$defs/roi"},
+        "seed": {"$ref": "#/$defs/seed"},
+        "visible_intervals_inclusive": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/frameInterval"}
+        },
+        "reviewed_axis_labels": {
+          "type": "array",
+          "minItems": 5,
+          "items": {"$ref": "#/$defs/axisLabel"}
+        },
+        "labelled_reclamp_frame": {"type": "integer", "minimum": 0},
+        "earliest_allowed_reclamp_frame": {"type": "integer", "minimum": 0}
+      }
+    },
+    "negativeCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "kind",
+        "replay_interval_inclusive",
+        "roi_uvxy",
+        "seed",
+        "evaluation_frames"
+      ],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "kind": {
+          "enum": ["partial_occlusion", "distractor_ambiguity"]
+        },
+        "replay_interval_inclusive": {"$ref": "#/$defs/frameInterval"},
+        "roi_uvxy": {"$ref": "#/$defs/roi"},
+        "seed": {"$ref": "#/$defs/seed"},
+        "evaluation_frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "integer", "minimum": 0},
+          "uniqueItems": true
+        }
+      }
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trial_id",
+        "recording_session_id",
+        "run_dir",
+        "pivot",
+        "negative_cases"
+      ],
+      "properties": {
+        "trial_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$"
+        },
+        "recording_session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "run_dir": {"type": "string", "minLength": 1},
+        "pivot": {"$ref": "#/$defs/pivot"},
+        "negative_cases": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"$ref": "#/$defs/negativeCase"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "demo2gripper.test_tube_closed_loop_config.v1",
+  "task_id": "synthetic-test-tube-seven-stage-v1",
+  "execution_scope": "synthetic_replay_only",
+  "geometry": {
+    "relation_id": "SYNTHETIC-IDENTITY-RELATION-DO-NOT-EXECUTE",
+    "relation_source": "synthetic_fixture_only_not_recovered_from_demo",
+    "relation_runtime_qualified": true,
+    "T_tube_tcp_demo_grasp": [
+      [1.0, 0.0, 0.0, 0.0],
+      [0.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 1.0, 0.0],
+      [0.0, 0.0, 0.0, 1.0]
+    ],
+    "socket_entry_source": "synthetic_fixture_only_not_measured",
+    "socket_entry_runtime_qualified": true,
+    "T_socket_tube_entry": [
+      [1.0, 0.0, 0.0, 0.0],
+      [0.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 1.0, 0.0],
+      [0.0, 0.0, 0.0, 1.0]
+    ],
+    "tube_axis_tube": [0.0, 0.0, 1.0],
+    "socket_outward_axis_socket": [0.0, 0.0, 1.0]
+  },
+  "pose_backend": {
+    "name": "synthetic_replay"
+  },
+  "policy": {
+    "servo_settle_windows": 1,
+    "insertion_target_depth_m": 0.003,
+    "default_stage_timeout_s": 100.0,
+    "close_timeout_s": 100.0,
+    "insertion_timeout_s": 100.0
+  }
+}

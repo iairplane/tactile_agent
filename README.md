@@ -2,7 +2,7 @@
 
 把一段标定后的 RGB-D 人手示范压缩成**物体坐标系中的平行夹爪抓取意图**，再从 GraspGenX 候选中选出实际 Franka Panda 能执行的 6-DoF 抓取位姿，并交给 Isaac Lab 做接近、闭合、抬升和保持验证。
 
-在另一台 Ubuntu/Franka 主机上部署时，先阅读 [`AGENTS.md`](AGENTS.md)。其中区分了可直接安装的核心环境、需要独立安装的 GPU 后端和当前尚未实现的真机执行器；本文中的 `/home/lzr`、`/mnt/sdb` 与物理 GPU 7 是原机器的复现实录，不是新机器必须沿用的配置。
+在另一台 Ubuntu/Franka 主机上部署时，先阅读 [`AGENTS.md`](AGENTS.md)。其中区分了可直接安装的核心环境、需要独立安装的 GPU 后端、当前已验证的 FR3 + Hand-E 窄任务执行器，以及仍未完成的通用执行能力；本文中的 `/home/lzr`、`/mnt/sdb` 与物理 GPU 7 是原机器的复现实录，不是新机器必须沿用的配置。
 
 ```text
 RGB-D + K + CAD
@@ -19,6 +19,32 @@ RGB-D + K + CAD
 ```
 
 当前实现锁定为：单个主动手、单个刚性目标、已知 CAD、标定且同步的 RGB-D、Franka Panda 平行夹爪。核心 `learn-intent` 处理拇指—食指捏取；`infer_power_grasp_intent.py` 用于电钻这类整手握持。瓶身与瓶盖等相对运动的部件必须分别分割、分别建模和跟踪，不能共用一个刚体位姿。
+
+当前工作站连接的是 **FR3 + Robotiq Hand-E（最大总开口 50 mm）**。RGB-D、手眼标定、物体
+位姿和规范 TCP 目标可复用；下面标有 Panda Hand 的 `80 mm` 开口、`0.1034 m` 偏移、
+`panda_hand` 命令帧和 `prepare_franka_panda_plan.py` 不能用于这台真机。当前 Hand-E 路径
+已有实测/验证中的 TCP、50 mm 开口约束、夹爪驱动和固定 pick-to-lift 执行器，但 MoveIt
+仍使用 arm-only 模型，尚未补全 Hand-E/适配板/手指的 URDF/SRDF、碰撞体、负载和重心。
+
+## Agentic 示教原型
+
+当前实验分支可以把一次无 CAD 抓取示教编译为阶段化 skill：自由运动阶段保留人手路径
+形状并交给运动规划，`GRASP` 阶段单独保存人手与物体的相对抓取关系。通用 `TaskSkill`
+和 `AgentLoop` 仍为 `review_only`；另有一个针对当前 FR3 + Hand-E 桌面抓取的确定性 runner，
+按 `OBSERVE -> GROUND -> PLAN -> PREGRASP -> DESCEND -> CLOSE -> VERIFY_CONTACT -> LIFT`
+执行，并根据实测 TCP 和夹爪反馈继续或恢复。该窄链路已在 Run 05 真机完成抓取和 40 mm
+抬升。
+
+```bash
+.venv/bin/python scripts/compile_agentic_skill.py \
+  --demo-dir runs/live/<demo-name> \
+  --selected-grasp runs/live/<demo-name>/selected_grasp.json
+```
+
+输出包括 `agentic_skill.json`、`trajectory.npz`、编译报告以及图片/视频预览。数据合同、
+grounding anchor 和通用 agent 合同见 [`docs/agentic_control.md`](docs/agentic_control.md)；
+真机调试后确定的完整分层、执行门、证据和能力边界见
+[`docs/refined_real_robot_framework.md`](docs/refined_real_robot_framework.md)。
 
 ## 方法选择
 
@@ -107,7 +133,7 @@ python scripts/clone_backends.py \
 
 ## 真实示范的最短路径
 
-1. 同步保存 RGB、与 RGB 对齐的深度、相机内参 `K` 和秒级时间戳；深度统一为米。另存标定外参 `calibration/T_world_camera.npy`，约定为相机坐标到仿真世界坐标的 `4×4` 变换。
+1. 用 `scripts/capture_realsense_rgbd.py --serial '<序列号>' --output-dir runs/real/input` 同步保存 RGB、与 RGB 对齐的深度、相机内参 `K` 和设备硬件时间戳；深度统一为米。固定外部相机可使用 ChArUco 或满足方向唯一性约束的普通棋盘格，通过 `capture_handeye_sample.py` 和 `solve_eye_to_hand.py` 标定 `calibration/T_base_camera.npy`，约定为相机坐标到 FR3 基座坐标的 `4×4` 变换。完整采集、打印和标定步骤见 [`docs/perception_io.md`](docs/perception_io.md)。
 2. 用 `scripts/segment_sam3.py --text-prompt '<目标类别>'` 得到目标物体 mask；该路径不接收真值框或真值 mask。人手和会独立运动的部件仍用 `scripts/segment_sam2.py` 分配独立 ID 并传播全序列。不要把手与物体合成一个 mask；完整命令见 [`docs/perception_io.md`](docs/perception_io.md)。
 3. 运行 `scripts/track_rtmpose_rgbd.py`：每帧从 SAM 手 mask 取 bbox，RTMPose-m Hand5 输出 21 个 2D 关节，再用同帧对齐深度和真实 `K` 将每个关节反投影到相机米制坐标。GPU7、ONNX 和 10 FPS 实跑命令见 [`docs/perception_io.md`](docs/perception_io.md)。
 4. 用 `scripts/estimate_wapr_pose.py` 将目标 mask、RGB、米制 depth、`K` 和 CAD 接入 WAPR，输出 object-to-camera 的 `T_camera_object.npy`。原版 `scripts/track_foundationpose_original.py` 保留为已实跑 fallback。
@@ -128,7 +154,7 @@ python scripts/clone_backends.py \
      --t-camera-object runs/real/wapr/T_camera_object.npy \
      --hand-joints-camera-m runs/real/hand_pose/hand_joints_camera_m.npy \
      --confidence runs/real/hand_pose/hand_joint_confidence.npy \
-     --timestamps-s runs/real/hand_pose/timestamps_s.npy \
+     --timestamps-s runs/real/input/timestamps_s.npy \
      --output runs/real/observations.npz
    ```
 
@@ -150,7 +176,7 @@ python scripts/clone_backends.py \
    抓持区域选择具有 CAD 双侧接触的候选。完整实跑见
    [`docs/imitrob_powerdrill.md`](docs/imitrob_powerdrill.md)。
 
-8. 在 GraspGenX 的独立环境中为 `franka_panda` 生成候选。官方 YAML 给出 gripper-base pose；转换时沿候选局部 `+Z` 加上 Panda 的 0.1034 m base-to-TCP 偏移，得到本项目的 `T_object_gripper_tcp`：
+8. 以下候选转换只适用于 stock Panda Hand。在 GraspGenX 的独立环境中为 `franka_panda` 生成候选。官方 YAML 给出 gripper-base pose；转换时沿候选局部 `+Z` 加上 Panda 的 0.1034 m base-to-TCP 偏移，得到本项目的 `T_object_gripper_tcp`。FR3 + Hand-E 必须改用 `robotiq_hande` 资产、实测 TCP 和 `0.05 m` 最大开口，不能照抄这些参数：
 
    ```bash
    CUDA_VISIBLE_DEVICES=7 python scripts/convert_graspgenx.py \
@@ -234,8 +260,9 @@ p_parent = T_parent_child @ [p_child.x, p_child.y, p_child.z, 1]
 
 所有长度均为米，时间为秒。旋转矩阵右手系。
 
-WAPR 返回 `T_camera_object`，标定文件保存 `T_world_camera`，因此世界系估计直接为
-`T_world_object = T_world_camera @ T_camera_object`，不对任一项求逆。仿真导出的 GT
+WAPR 返回 `T_camera_object`。真机固定相机保存 `T_base_camera`，因此
+`T_base_object = T_base_camera @ T_camera_object`；Isaac 仿真保存 `T_world_camera`，因此
+`T_world_object = T_world_camera @ T_camera_object`。两种合成都不对任一项求逆。仿真导出的 GT
 `evaluation/T_world_object.npy` 只用于 `evaluate_object_pose.py` 评分，不进入分割、位姿估计、坐标合成或外部估计控制。
 
 `observations.npz` 只含：
@@ -258,5 +285,6 @@ WAPR 返回 `T_camera_object`，标定文件保存 `T_world_camera`，因此世�
 - 这不是从视频端到端学习策略；它学习的是可解释的物体相对接触几何，再映射到真实夹爪候选。
 - 整手握持当前只学习“抓 CAD 的哪个区域”；单视角遮挡下的背侧人体接触、接触力和机器人接近轴不可直接观测。双手协作和非刚体物体尚未建模。
 - 连续旋转对称物体可用 `--continuous-symmetry-axis` 按 yaw 等价类处理；当前假设该对称轴穿过 CAD 原点。离散对称或偏心对称轴尚未建模。
-- SAM/RTMPose/WAPR/GraspGenX 的原始输出格式并不天然一致；本仓库严格定义了交换合同，但相机采集、RGB-D 米制对齐和各后端导出钩子仍需接到你的具体设备与数据目录。
+- SAM/RTMPose/WAPR/GraspGenX 的原始输出格式并不天然一致；本仓库已经接入 RealSense
+  RGB-D 采集、米制对齐和硬件时间戳，各模型后端仍需使用对应的独立环境和输出适配器。
 - 仿真通过只证明该抓取在当前资产、摩擦和质量参数下可执行；它不替代真实机器人上的低速、限力验证。

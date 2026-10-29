@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 from pathlib import Path
 from typing import Any
-
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_LOCK = PROJECT_ROOT / "configs" / "backends.lock.json"
@@ -51,14 +51,14 @@ def load_backends(path: Path) -> dict[str, dict[str, Any]]:
 
 def run(command: list[str]) -> None:
     try:
-        subprocess.run(command, check=True)
+        env = os.environ.copy()
+        env["GIT_LFS_SKIP_SMUDGE"] = "1"
+        subprocess.run(command, check=True, env=env)
     except FileNotFoundError as exc:
         raise SystemExit(f"required executable not found: {command[0]}") from exc
     except subprocess.CalledProcessError as exc:
         joined = " ".join(command)
-        raise SystemExit(
-            f"command failed with exit code {exc.returncode}: {joined}"
-        ) from exc
+        raise SystemExit(f"command failed with exit code {exc.returncode}: {joined}") from exc
 
 
 def main() -> int:
@@ -83,9 +83,7 @@ def main() -> int:
         destination = destination_root / key
         if destination.exists():
             if not destination.is_dir() or any(destination.iterdir()):
-                raise SystemExit(
-                    f"refusing to overwrite existing path: {destination}"
-                )
+                raise SystemExit(f"refusing to overwrite existing path: {destination}")
 
         print(f"cloning {backend['name']} into {destination}")
         run(

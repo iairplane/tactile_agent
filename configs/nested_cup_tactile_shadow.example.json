@@ -1,0 +1,48 @@
+{
+  "schema": "demo2gripper.tactile_supervision_config.v1",
+  "profile_id": "nested_top_cup_rim_pick.role_aware.shadow.v2",
+  "status": "review_only",
+  "execution_qualified": false,
+  "contact_role_assignment_scope": "example current-probe hypothesis; may reverse after replanning",
+  "sensors": {
+    "left": {
+      "sdk_serial": null,
+      "calibration_id": null,
+      "contact_role": "inner",
+      "required": true
+    },
+    "right": {
+      "sdk_serial": null,
+      "calibration_id": null,
+      "contact_role": "outer",
+      "required": true
+    }
+  },
+  "predicates": {
+    "rim_capture_verified": {
+      "all": [
+        "sensor_healthy",
+        "inner_rim_match",
+        "outer_rim_match",
+        "normal_load_in_fragile_band",
+        "cup_deformation_budget_ok",
+        "no_overload"
+      ]
+    },
+    "cup_remains_coupled": {
+      "all": [
+        "inner_rim_contact",
+        "outer_rim_contact",
+        "stable_hold",
+        "no_slip",
+        "no_overload"
+      ]
+    },
+    "release_confirmed": {
+      "all": [
+        "gripper_open_verified",
+        "contact_and_load_released"
+      ]
+    }
+  }
+}
